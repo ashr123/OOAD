@@ -1,4 +1,5 @@
-package superLi;/*
+package superLi;
+/*
 Database Table Printer
 Copyright (C) 2014  Hami Galip Torun
 Email: hamitorun@e-fabrika.net
@@ -24,7 +25,12 @@ for version control and publishing an open source software.
 Hami
  */
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
@@ -383,14 +389,12 @@ public class DBTablePrinter
 				return;
 			}
 			printResultSet(rs, maxStringColWidth);
-
 		}
 		catch (SQLException e)
 		{
 			System.err.println("SQL exception in DBTablePrinter. Message:");
 			System.err.println(e.getMessage());
 		}
-		// ignore
 	}
 
 	/**
@@ -454,16 +458,13 @@ public class DBTablePrinter
 			// NOTE: columnIndex for rsmd.getXXX methods STARTS AT 1 NOT 0
 			for (int i=1; i<=columnCount; i++)
 			{
-				Column c=new Column(rsmd.getColumnLabel(i),
-				                    rsmd.getColumnType(i), rsmd.getColumnTypeName(i));
+				Column c=new Column(rsmd.getColumnLabel(i), rsmd.getColumnType(i), rsmd.getColumnTypeName(i));
 				c.setWidth(c.getLabel().length());
 				c.setTypeCategory(whichCategory(c.getType()));
 				columns.add(c);
 
 				if (!tableNames.contains(rsmd.getTableName(i)))
-				{
 					tableNames.add(rsmd.getTableName(i));
-				}
 			}
 
 			// Go through each row, get values of each column and adjust
@@ -480,21 +481,14 @@ public class DBTablePrinter
 					int category=c.getTypeCategory();
 
 					if (category==CATEGORY_OTHER)
-					{
-
 						// Use generic SQL type name instead of the actual value
 						// for column types BLOB, BINARY etc.
 						value="("+c.getTypeName()+")";
-
-					}
 					else
-					{
 						value=rs.getString(i+1)==null ? "NULL" : rs.getString(i+1);
-					}
 					switch (category)
 					{
 						case CATEGORY_DOUBLE:
-
 							// For real numbers, format the string value to have 3 digits
 							// after the point. THIS IS TOTALLY ARBITRARY and can be
 							// improved to be CONFIGURABLE.
@@ -504,26 +498,20 @@ public class DBTablePrinter
 								value=String.format("%.3f", dValue);
 							}
 							break;
-
 						case CATEGORY_STRING:
-
 							// Left justify the text columns
 							c.justifyLeft();
 
 							// and apply the width limit
 							if (value.length()>maxStringColWidth)
-							{
 								value=value.substring(0, maxStringColWidth-3)+"...";
-							}
 							break;
 					}
-
 					// Adjust the column width
 					c.setWidth(value.length()>c.getWidth() ? value.length() : c.getWidth());
 					c.addValue(value);
 				} // END of for loop columnCount
 				rowCount++;
-
 			} // END of while (rs.next)
 
             /*
@@ -581,7 +569,6 @@ public class DBTablePrinter
 				rowSeparator.append("+");
 				rowSeparator.append(new String(new char[width+2]).replace("\0", "-"));
 			}
-
 			String lineSeparator=System.getProperty("line.separator");
 
 			// Is this really necessary ??
@@ -624,7 +611,7 @@ public class DBTablePrinter
 				}
 
 //				System.out.println('|');
-				output.append("|\n");
+				output.append("|\n");//TODO can improve on '\n'
 //				System.out.print(rowSeparator);
 				output.append(rowSeparator);
 			}

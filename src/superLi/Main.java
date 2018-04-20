@@ -15,12 +15,11 @@ public class Main
 		boolean exit=false;
 		while (!exit)
 		{
-			int id;
+			int id, bankNum, bankBrunchNum, bankAccountNum;
 			double salary;
 			String fname, lname;
-			boolean isLeaving=false;
 			System.out.println("Enter command: 'add'/'update'/'get'/'exit':");
-			String comm=sc.nextLine();
+			String comm=sc.nextLine().trim();
 
 			switch (comm)
 			{
@@ -34,7 +33,13 @@ public class Main
 					lname=sc.nextLine();
 					System.out.print("Salary: ");
 					salary=Double.parseDouble(sc.nextLine());
-					if (Employee.addEmployee(id, fname, lname, salary))
+					System.out.print("Bank number: ");
+					bankNum=Integer.parseInt(sc.nextLine());
+					System.out.print("Bank brunch number: ");
+					bankBrunchNum=Integer.parseInt(sc.nextLine());
+					System.out.print("Bank account number: ");
+					bankAccountNum=Integer.parseInt(sc.nextLine());
+					if (Employee.addEmployee(id, fname, lname, salary, bankNum, bankBrunchNum, bankAccountNum))
 						System.out.println("success");
 					break;
 				}
@@ -54,20 +59,24 @@ public class Main
 					lname=sc.nextLine();
 					System.out.print("Salary: ");
 					salary=Double.parseDouble(sc.nextLine());
-					System.out.print("Is leaving(Y/N): ");
-					if (sc.nextLine().equals("Y"))
-						isLeaving=true;
-					emp.updateEmployee(fname, lname, isLeaving, salary);
+					System.out.print("Bank number: ");
+					bankNum=Integer.parseInt(sc.nextLine());
+					System.out.print("Bank brunch number: ");
+					bankBrunchNum=Integer.parseInt(sc.nextLine());
+					System.out.print("Bank account number: ");
+					bankAccountNum=Integer.parseInt(sc.nextLine());
+					emp.updateEmployee(fname, lname, salary, bankNum, bankBrunchNum, bankAccountNum);
 					break;
 				}
 				case "get":
 				{
 					System.out.print("Id: ");
 					id=Integer.parseInt(sc.nextLine());
-					Employee employee=Employee.getEmployee(id);
+//					Employee employee=Employee.getEmployee(id);
 					System.out.println(Employee.getEmployee(id));
 					break;
 				}
+				case "q":
 				case "exit":
 				{
 					exit=true;
