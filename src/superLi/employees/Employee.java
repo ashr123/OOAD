@@ -3,6 +3,8 @@ package superLi.employees;
 import superLi.DBTablePrinter;
 
 import java.sql.*;
+import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * Represents an employee in a neighborhood grocery store.
@@ -16,6 +18,7 @@ public class Employee
 	private Date startingDate;
 	private double salary;
 	private int bankNum, bankBrunchNum, bankAccountNum;
+	private Collection<Availability> availabilities=new LinkedList<>();
 
 	//Initiates the DB for the first time if not exists.
 	static
@@ -25,11 +28,10 @@ public class Employee
 			try (Connection conn=DriverManager.getConnection(DB_CON_URL);
 			     Statement stmt=conn.createStatement())
 			{
-//				stmt.executeUpdate("DROP TABLE IF EXISTS Employees;");
-//				stmt.executeUpdate("DROP TABLE IF EXISTS WorkingHours;");
-//				stmt.executeUpdate("DROP TABLE IF EXISTS jobs;");
-//				stmt.executeUpdate("DROP TABLE IF EXISTS Shifts;");
-//				stmt.executeUpdate("DROP TABLE IF EXISTS Qualifications;");
+				//				stmt.executeUpdate("DROP TABLE IF EXISTS Employees;");
+				//				stmt.executeUpdate("DROP TABLE IF EXISTS WorkingHours;");
+				//				stmt.executeUpdate("DROP TABLE IF EXISTS jobs;");
+				//				stmt.executeUpdate("DROP TABLE IF EXISTS Qualifications;");
 				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Employees"+
 				                   '('+
 				                   "ID INTEGER PRIMARY KEY CHECK (ID BETWEEN 100000000 AND 999999999), "+
@@ -42,13 +44,13 @@ public class Employee
 				                   "bankAccountNum INTEGER NOT NULL CHECK (bankAccountNum BETWEEN 100000 AND 999999)"+
 				                   ");"
 				                  );
-				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS WorkingHours" +
+				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS WorkingHours"+
 				                   "("+
 				                   "ID INTEGER REFERENCES Employees(ID) ON DELETE CASCADE, "+
 				                   "date TEXT NOT NULL CHECK (DATE(date)>=DATE('now')), "+
 				                   "morningShift BOOLEAN NOT NULL, "+
-				                   "noonShift BOOLEAN NOT NULL," +
-				                   "PRIMARY KEY(ID, date, morningShift, noonShift)," +
+				                   "noonShift BOOLEAN NOT NULL,"+
+				                   "PRIMARY KEY(ID, date, morningShift, noonShift),"+
 				                   "CONSTRAINT bbb CHECK (morningShift OR noonShift)"+
 				                   ");"
 				                  );
@@ -57,21 +59,12 @@ public class Employee
 				                   "job TEXT PRIMARY KEY"+
 				                   ");"
 				                  );
-				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Shifts"+
-				                   "("+
-				                   "ID INTEGER references Employees(ID) ON DELETE NO ACTION, "+
-				                   "date TEXT NOT NULL CHECK (DATE(date)>=DATE('now')), "+
-				                   "isMorningShift BOOLEAN NOT NULL, "+
-				                   "job TEXT references Jobs(job) ON DELETE NO ACTION, "+
-				                   "PRIMARY KEY(ID, date, isMorningShift, job)"+
-				                   ");"
-				                  );
 				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Qualifications"+
-				             "("+
-				             "ID INTEGER REFERENCES Employees(ID) ON DELETE CASCADE, " +
-				                   "job TEXT references Jobs(job) ON DELETE CASCADE, " +
-				                   "PRIMARY KEY (ID, job)" +
-				             ");");
+				                   "("+
+				                   "ID INTEGER REFERENCES Employees(ID) ON DELETE CASCADE, "+
+				                   "job TEXT references Jobs(job) ON DELETE CASCADE, "+
+				                   "PRIMARY KEY (ID, job)"+
+				                   ");");
 			}
 			catch (SQLException e)
 			{
@@ -180,41 +173,21 @@ public class Employee
 		}
 	}
 
-	public static boolean isShiftExists(String day, String month, String year, boolean isMorningShift)
-	{
-		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
-		     PreparedStatement stmt=conn.prepareStatement("SELECT * FROM Shifts WHERE "+
-		                                                  "DATE(date)=DATE(?) AND "+
-		                                                  "isMorningShift is ?;"))
-		{
-			stmt.setString(1, year+'-'+month+'-'+day);
-			stmt.setBoolean(2, isMorningShift);
-			try (ResultSet resultSet=stmt.executeQuery())
-			{
-				return !resultSet.isClosed();
-			}
-		}
-		catch (SQLException e)
-		{
-			System.err.println(e);//TODO: print a nicer message
-			return false;
-		}
-	}
-
-	public static String showAvailableEmployeesToShift(String day, String month, String year, boolean isMorningShift, String job)
+	public static String showAvailableEmployeesToShift(String day, String month, String year, boolean isMorningShift,
+	                                                   String job)
 	{
 		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
 		     PreparedStatement stmt=conn.prepareStatement(isMorningShift ?
 		                                                  "SELECT Employees.ID, firstName, lastName "+
 		                                                  "FROM Employees, WorkingHours, Qualifications "+
 		                                                  "WHERE DATE(date)=DATE(?) AND "+
-		                                                  "MorningShift is TRUE AND " +
+		                                                  "MorningShift is TRUE AND "+
 		                                                  "Qualifications.job=?;" :
 
 		                                                  "SELECT Employees.ID, firstName, lastName "+
 		                                                  "FROM Employees, WorkingHours, Qualifications "+
 		                                                  "WHERE DATE(date)=DATE(?) AND "+
-		                                                  "noonShift is TRUE AND " +
+		                                                  "noonShift is TRUE AND "+
 		                                                  "Qualifications.job=?;"))
 		{
 			stmt.setString(1, year+'-'+month+'-'+day);
@@ -244,83 +217,6 @@ public class Employee
 		{
 			System.err.println(e);//TODO: print a nicer message
 			return false;
-		}
-	}
-
-	public static void addEmployeeToShift(int ID, String day, String month, String year, boolean isMorningShift, String job)
-	{
-		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
-		     PreparedStatement stmt=conn.prepareStatement("SELECT * FROM WorkingHours WHERE "+
-		                                                  "DATE(date)=DATE(?) AND "+
-		                                                  "morningShift is ? AND ID=?"))
-		{
-			stmt.setString(1, year+'-'+month+'-'+day);
-			stmt.setBoolean(2, isMorningShift);
-			stmt.setInt(3, ID);
-			try (ResultSet resultSet=stmt.executeQuery())
-			{
-				while (resultSet.next())
-					try (PreparedStatement stmt2=conn.prepareStatement("INSERT INTO Shifts (ID, " +
-					                                                   "date, " +
-					                                                   "isMorningShift, " +
-					                                                   "job) VALUES (?, ?, ?, ?);"))
-					{
-						stmt2.setInt(1, ID);
-						stmt2.setString(2, year+'-'+month+'-'+day);
-						stmt2.setBoolean(3, isMorningShift);
-						stmt2.setString(4, job);
-						stmt2.executeUpdate();
-					}
-			}
-		}
-		catch (SQLException e)
-		{
-			System.err.println(e);//TODO: print a nicer message
-		}
-	}
-
-	public static String showShiftAt(String day, String month, String year, boolean isMorningShift)
-	{
-		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
-		     PreparedStatement stmt=conn.prepareStatement("SELECT Employees.ID, firstName, lastName, " +
-		                                                  "job FROM " +
-		                                                  "Employees, Shifts " +
-		                                                  "WHERE "+
-		                                                  "DATE(date)=DATE(?) AND "+
-		                                                  "isMorningShift is ? AND Employees.ID=Shifts.ID;"))
-		{
-			stmt.setString(1, year+'-'+month+'-'+day);
-			stmt.setBoolean(2, isMorningShift);
-			try (ResultSet resultSet=stmt.executeQuery())
-			{
-				return DBTablePrinter.printResultSet(resultSet);
-			}
-		}
-		catch (SQLException e)
-		{
-			System.err.println(e);//TODO: print a nicer message
-			return null;
-		}
-	}
-
-	public static String seeAvailableEmployeesForShift(String day, String month, String year, boolean isMorningShift)
-	{
-		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
-		     PreparedStatement stmt=conn.prepareStatement("SELECT * FROM WorkingHours WHERE " +
-		                                                  "DATE(date)=DATE(?) AND " +
-		                                                  "morningShift is ?;"))
-		{
-			stmt.setString(1, year+'-'+month+'-'+day);
-			stmt.setBoolean(2, isMorningShift);
-			try (ResultSet resultSet=stmt.executeQuery())
-			{
-				return DBTablePrinter.printResultSet(resultSet);
-			}
-		}
-		catch (SQLException e)
-		{
-			System.err.println(e);//TODO: print a nicer message
-			return null;
 		}
 	}
 
@@ -362,6 +258,11 @@ public class Employee
 	public int getBankAccountNum()
 	{
 		return bankAccountNum;
+	}
+
+	public LinkedList<Availability> getAvailabilities()
+	{
+		return new LinkedList<>(availabilities);
 	}
 
 	/**

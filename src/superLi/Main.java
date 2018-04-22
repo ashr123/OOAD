@@ -1,6 +1,7 @@
 package superLi;
 
 import superLi.employees.Employee;
+import superLi.employees.Shift;
 
 import java.util.Scanner;
 
@@ -69,7 +70,7 @@ public class Main
 					id=Integer.parseInt(sc.nextLine());
 					System.out.println(Employee.getEmployee(id));
 					break;
-				case "addworking":
+				case "addworking"://TODO
 					System.out.print("Enter year (yyyy): ");
 					year=sc.nextLine();
 					System.out.print("Enter month (mm): ");
@@ -79,7 +80,8 @@ public class Main
 					System.out.print("Is it a morning shift? (y/n): ");
 					cIsMorningShift=sc.nextLine();
 					isMorningShift=cIsMorningShift.equals("y");
-					System.out.println(Employee.seeAvailableEmployeesForShift(day, month, year, isMorningShift));
+
+//					System.out.println(Employee.seeAvailableEmployeesForShift(day, month, year, isMorningShift));
 					break;
 				case "addjob":
 					System.out.print("Enter job: ");
@@ -97,7 +99,7 @@ public class Main
 					System.out.print("Is it a morning shift? (y/n): ");
 					cIsMorningShift=sc.nextLine();
 					isMorningShift=cIsMorningShift.equals("y");
-					if (Employee.isShiftExists(day, month, year,isMorningShift))
+					if (Shift.isShiftExists(day, month, year,isMorningShift))
 					{
 						System.out.println("Available managers for this shift:\n"+
 						                   Employee.showAvailableEmployeesToShift(day,
@@ -107,7 +109,7 @@ public class Main
 						                                                          "Manager"));
 						System.out.print("Enter manager ID: ");
 						id=Integer.parseInt(sc.nextLine());
-						Employee.addEmployeeToShift(id, day, month, year, isMorningShift, "Manager");
+						Shift.addEmployeeToShift(id, day, month, year, isMorningShift, "Manager");
 					}
 					System.out.print("Enter job (q to stop): ");
 					String job=sc.nextLine();
@@ -121,7 +123,7 @@ public class Main
 						                                                          job));
 						System.out.print("Enter employee ID: ");
 						id=sc.nextInt();
-						Employee.addEmployeeToShift(id, day, month, year, isMorningShift, job);
+						Shift.addEmployeeToShift(id, day, month, year, isMorningShift, job);
 						System.out.print("Enter job (q to stop): ");
 						job=sc.nextLine();
 					}
@@ -136,7 +138,7 @@ public class Main
 					System.out.print("Is it a morning shift? (y/n): ");
 					cIsMorningShift=sc.nextLine();
 					isMorningShift=cIsMorningShift.equals("y");
-					System.out.println(Employee.showShiftAt(day, month, year, isMorningShift));
+					System.out.println(Shift.showShiftAt(day, month, year, isMorningShift));
 					break;
 				case "q":
 				case "exit":
