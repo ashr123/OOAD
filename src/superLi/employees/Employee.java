@@ -29,6 +29,7 @@ public class Employee
 //				stmt.executeUpdate("DROP TABLE IF EXISTS WorkingHours;");
 //				stmt.executeUpdate("DROP TABLE IF EXISTS jobs;");
 //				stmt.executeUpdate("DROP TABLE IF EXISTS Shifts;");
+//				stmt.executeUpdate("DROP TABLE IF EXISTS Qualifications;");
 				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Employees"+
 				                   '('+
 				                   "ID INTEGER PRIMARY KEY CHECK (ID BETWEEN 100000000 AND 999999999), "+
@@ -37,7 +38,7 @@ public class Employee
 				                   "salary REAL NOT NULL CHECK (salary>=0), "+
 				                   "startingDate TEXT NOT NULL, "+
 				                   "bankNum INTEGER NOT NULL CHECK (bankNum BETWEEN 10 AND 99), "+
-				                   "bankBrunchNum INTEGER NOT NULL CHECK (bankBrunchNum BETWEEN 100 AND 999), "+
+				                   "bankBranchNum INTEGER NOT NULL CHECK (bankBranchNum BETWEEN 100 AND 999), "+
 				                   "bankAccountNum INTEGER NOT NULL CHECK (bankAccountNum BETWEEN 100000 AND 999999)"+
 				                   ");"
 				                  );
@@ -58,17 +59,19 @@ public class Employee
 				                  );
 				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Shifts"+
 				                   "("+
-				                   "ID INTEGER references Employees(ID) ON DELETE CASCADE, "+
+				                   "ID INTEGER references Employees(ID) ON DELETE NO ACTION, "+
 				                   "date TEXT NOT NULL CHECK (DATE(date)>=DATE('now')), "+
 				                   "isMorningShift BOOLEAN NOT NULL, "+
-				                   "job TEXT references Jobs(job), "+
+				                   "job TEXT references Jobs(job) ON DELETE NO ACTION, "+
 				                   "PRIMARY KEY(ID, date, isMorningShift, job)"+
 				                   ");"
 				                  );
-//				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS ManagersInShifts"+
-//				             "("+
-//				             "ID INTEGER PRIMARY KEY REFERENCES Employees(ID) ON DELETE CASCADE" +
-//				             ");");
+				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Qualifications"+
+				             "("+
+				             "ID INTEGER REFERENCES Employees(ID) ON DELETE CASCADE, " +
+				                   "job TEXT references Jobs(job) ON DELETE CASCADE, " +
+				                   "PRIMARY KEY (ID, job)" +
+				             ");");
 			}
 			catch (SQLException e)
 			{
@@ -168,6 +171,57 @@ public class Employee
 				}
 				else
 					return null;
+			}
+		}
+		catch (SQLException e)
+		{
+			System.err.println(e);//TODO: print a nicer message
+			return null;
+		}
+	}
+
+	public static boolean isShiftExists(String day, String month, String year, boolean isMorningShift)
+	{
+		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
+		     PreparedStatement stmt=conn.prepareStatement("SELECT * FROM Shifts WHERE "+
+		                                                  "DATE(date)=DATE(?) AND "+
+		                                                  "isMorningShift is ?;"))
+		{
+			stmt.setString(1, year+'-'+month+'-'+day);
+			stmt.setBoolean(2, isMorningShift);
+			try (ResultSet resultSet=stmt.executeQuery())
+			{
+				return !resultSet.isClosed();
+			}
+		}
+		catch (SQLException e)
+		{
+			System.err.println(e);//TODO: print a nicer message
+			return false;
+		}
+	}
+
+	public static String showAvailableEmployeesToShift(String day, String month, String year, boolean isMorningShift, String job)
+	{
+		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
+		     PreparedStatement stmt=conn.prepareStatement(isMorningShift ?
+		                                                  "SELECT Employees.ID, firstName, lastName "+
+		                                                  "FROM Employees, WorkingHours, Qualifications "+
+		                                                  "WHERE DATE(date)=DATE(?) AND "+
+		                                                  "MorningShift is TRUE AND " +
+		                                                  "Qualifications.job=?;" :
+
+		                                                  "SELECT Employees.ID, firstName, lastName "+
+		                                                  "FROM Employees, WorkingHours, Qualifications "+
+		                                                  "WHERE DATE(date)=DATE(?) AND "+
+		                                                  "noonShift is TRUE AND " +
+		                                                  "Qualifications.job=?;"))
+		{
+			stmt.setString(1, year+'-'+month+'-'+day);
+			stmt.setString(2, job);
+			try (ResultSet resultSet=stmt.executeQuery())
+			{
+				return DBTablePrinter.printResultSet(resultSet);
 			}
 		}
 		catch (SQLException e)
@@ -317,12 +371,12 @@ public class Employee
 	 * @param lastName       the new last name of the employee
 	 * @param salary         the new salary of the employee
 	 * @param bankNum        number of the employee's bank
-	 * @param bankBrunchNum  number of the employee's bank's brunch
+	 * @param bankBranchNum  number of the employee's bank's brunch
 	 * @param bankAccountNum number of the employee's bank account
 	 * @return {@code true} if the update was successful, {@code false} otherwise
 	 */
 	public synchronized boolean updateEmployee(String firstName, String lastName, double salary, int bankNum,
-	                                           int bankBrunchNum, int bankAccountNum)
+	                                           int bankBranchNum, int bankAccountNum)
 	{
 		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
 		     PreparedStatement stmt=conn.prepareStatement("UPDATE Employees SET firstName=?, "+
@@ -337,16 +391,15 @@ public class Employee
 			stmt.setString(2, lastName=lastName.trim());
 			stmt.setDouble(3, salary);
 			stmt.setInt(4, bankNum);
-			stmt.setInt(5, bankBrunchNum);
+			stmt.setInt(5, bankBranchNum);
 			stmt.setInt(6, bankAccountNum);
 			stmt.setInt(7, getID());
 			stmt.executeUpdate();
-			//			this.startingDate=Date.valueOf(LocalDate.now());
 			this.firstName=firstName;
 			this.lastName=lastName;
 			this.salary=salary;
 			this.bankNum=bankNum;
-			this.bankBrunchNum=bankBrunchNum;
+			this.bankBrunchNum=bankBranchNum;
 			this.bankAccountNum=bankAccountNum;
 			return true;
 		}

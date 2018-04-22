@@ -14,7 +14,7 @@ public class Main
 		Scanner sc=new Scanner(System.in);
 		while (true)
 		{
-			int id, bankNum, bankBrunchNum, bankAccountNum;
+			int id=0, bankNum, bankBranchNum, bankAccountNum;
 			double salary;
 			String fname, lname, year, month, day, cIsMorningShift;
 			boolean isMorningShift=false;
@@ -35,10 +35,10 @@ public class Main
 					System.out.print("Bank number: ");
 					bankNum=sc.nextInt();
 					System.out.print("Bank brunch number: ");
-					bankBrunchNum=sc.nextInt();
+					bankBranchNum=sc.nextInt();
 					System.out.print("Bank account number: ");
 					bankAccountNum=sc.nextInt();
-					if (Employee.addEmployee(id, fname, lname, salary, bankNum, bankBrunchNum, bankAccountNum))
+					if (Employee.addEmployee(id, fname, lname, salary, bankNum, bankBranchNum, bankAccountNum))
 						System.out.println("success");
 					break;
 				case "update":
@@ -59,10 +59,10 @@ public class Main
 					System.out.print("Bank number: ");
 					bankNum=sc.nextInt();
 					System.out.print("Bank brunch number: ");
-					bankBrunchNum=sc.nextInt();
+					bankBranchNum=sc.nextInt();
 					System.out.print("Bank account number: ");
 					bankAccountNum=Integer.parseInt(sc.nextLine());
-					emp.updateEmployee(fname, lname, salary, bankNum, bankBrunchNum, bankAccountNum);
+					emp.updateEmployee(fname, lname, salary, bankNum, bankBranchNum, bankAccountNum);
 					break;
 				case "get":
 					System.out.print("Id: ");
@@ -86,20 +86,45 @@ public class Main
 					Employee.addJob(sc.nextLine());
 					break;
 				case "addshift":
-					System.out.print("Id: ");
-					id=Integer.parseInt(sc.nextLine());
+//					System.out.print("Id: ");
+//					id=Integer.parseInt(sc.nextLine());
 					System.out.print("Enter year (yyyy): ");
 					year=sc.nextLine();
 					System.out.print("Enter month (mm): ");
 					month=sc.nextLine();
 					System.out.print("Enter day (dd): ");
 					day=sc.nextLine();
-					System.out.println("Enter job: ");
-					String job=sc.nextLine();
 					System.out.print("Is it a morning shift? (y/n): ");
 					cIsMorningShift=sc.nextLine();
 					isMorningShift=cIsMorningShift.equals("y");
-					Employee.addEmployeeToShift(id, day, month, year, isMorningShift, job);
+					if (Employee.isShiftExists(day, month, year,isMorningShift))
+					{
+						System.out.println("Available managers for this shift:\n"+
+						                   Employee.showAvailableEmployeesToShift(day,
+						                                                          month,
+						                                                          year,
+						                                                          isMorningShift,
+						                                                          "Manager"));
+						System.out.print("Enter manager ID: ");
+						id=Integer.parseInt(sc.nextLine());
+						Employee.addEmployeeToShift(id, day, month, year, isMorningShift, "Manager");
+					}
+					System.out.print("Enter job (q to stop): ");
+					String job=sc.nextLine();
+					while (!job.equals("q"))
+					{
+						System.out.println("Available employees for this job:\n"+
+						                   Employee.showAvailableEmployeesToShift(day,
+						                                                          month,
+						                                                          year,
+						                                                          isMorningShift,
+						                                                          job));
+						System.out.print("Enter employee ID: ");
+						id=sc.nextInt();
+						Employee.addEmployeeToShift(id, day, month, year, isMorningShift, job);
+						System.out.print("Enter job (q to stop): ");
+						job=sc.nextLine();
+					}
 					break;
 				case "showshift":
 					System.out.print("Enter year (yyyy): ");
