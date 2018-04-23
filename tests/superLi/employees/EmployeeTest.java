@@ -23,7 +23,7 @@ public class EmployeeTest
 	}
 
 	@BeforeClass
-	static void populateDBs()
+	public static void populateDBs()
 	{
 		Employee.init();
 		Shift.init();
@@ -100,7 +100,7 @@ public class EmployeeTest
 	}
 
 	@AfterClass
-	static void unPopulateDBs()
+	public static void unPopulateDBs()
 	{
 		try (Connection conn=getConnection();
 		     PreparedStatement stmt1=conn.prepareStatement("DELETE FROM Employees WHERE ID=? OR ID=?;");
@@ -171,6 +171,17 @@ public class EmployeeTest
 	@Test
 	public void showAvailableEmployeesToShift()
 	{
+//		System.out.println(Employee.showAvailableEmployeesToShift(LocalDate.now().getDayOfMonth()<10 ?
+//		                                                          "0"+LocalDate.now().getDayOfMonth() :
+//		                                                          LocalDate.now().getDayOfMonth()+"",
+//
+//		                                                          LocalDate.now().getMonthValue()<10 ?
+//		                                                          "0"+LocalDate.now().getMonthValue() :
+//		                                                          LocalDate.now().getMonthValue()+"",
+//
+//		                                                          LocalDate.now().getYear()+"",
+//		                                                          true,
+//		                                                          "job1"));
 		assertNotNull(Employee.showAvailableEmployeesToShift(LocalDate.now().getDayOfMonth()<10 ?
 		                                                     "0"+LocalDate.now().getDayOfMonth() :
 		                                                     LocalDate.now().getDayOfMonth()+"",
@@ -180,7 +191,8 @@ public class EmployeeTest
 		                                                     LocalDate.now().getMonthValue()+"",
 
 		                                                     LocalDate.now().getYear()+"",
-		                                                     true, "job1"));
+		                                                     true,
+		                                                     "job1"));
 	}
 
 	@Test
