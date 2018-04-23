@@ -70,7 +70,7 @@ public class Main
 					id=Integer.parseInt(sc.nextLine());
 					System.out.println(Employee.getEmployee(id));
 					break;
-				case "addworking"://TODO
+				case "addworking"://TODO complete
 					System.out.print("Enter year (yyyy): ");
 					year=sc.nextLine();
 					System.out.print("Enter month (mm): ");

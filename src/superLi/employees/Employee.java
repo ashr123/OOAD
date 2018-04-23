@@ -19,6 +19,7 @@ public class Employee
 	private double salary;
 	private int bankNum, bankBrunchNum, bankAccountNum;
 	private Collection<Availability> availabilities=new LinkedList<>();
+	private Collection<String> qualifications=new LinkedList<>();
 
 	//Initiates the DB for the first time if not exists.
 	static
@@ -28,10 +29,10 @@ public class Employee
 			try (Connection conn=DriverManager.getConnection(DB_CON_URL);
 			     Statement stmt=conn.createStatement())
 			{
-				//				stmt.executeUpdate("DROP TABLE IF EXISTS Employees;");
-				//				stmt.executeUpdate("DROP TABLE IF EXISTS WorkingHours;");
-				//				stmt.executeUpdate("DROP TABLE IF EXISTS jobs;");
-				//				stmt.executeUpdate("DROP TABLE IF EXISTS Qualifications;");
+//				stmt.executeUpdate("DROP TABLE IF EXISTS Employees;");
+//				stmt.executeUpdate("DROP TABLE IF EXISTS WorkingHours;");
+//				stmt.executeUpdate("DROP TABLE IF EXISTS jobs;");
+//				stmt.executeUpdate("DROP TABLE IF EXISTS Qualifications;");
 				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Employees"+
 				                   '('+
 				                   "ID INTEGER PRIMARY KEY CHECK (ID BETWEEN 100000000 AND 999999999), "+
@@ -88,7 +89,7 @@ public class Employee
 	 * @param bankAccountNum number of the employee's bank account
 	 */
 	private Employee(int ID, String firstName, String lastName, Date startingDate, double salary,
-	                 int bankNum, int bankBrunchNum, int bankAccountNum)
+	                 int bankNum, int bankBrunchNum, int bankAccountNum) throws SQLException
 	{
 		this.ID=ID;
 		this.firstName=firstName;
@@ -98,6 +99,25 @@ public class Employee
 		this.bankNum=bankNum;
 		this.bankBrunchNum=bankBrunchNum;
 		this.bankAccountNum=bankAccountNum;
+		try(Connection conn=DriverManager.getConnection(DB_CON_URL);
+		    PreparedStatement stmt=conn.prepareStatement(
+				    "SELECT date, morningShift, noonShift FROM WorkingHours WHERE ID=?;");
+		    PreparedStatement stmt2=conn.prepareStatement("SELECT job FROM Qualifications WHERE ID=?"))
+		{
+			stmt.setInt(1, ID);
+			stmt2.setInt(1, ID);
+			try (ResultSet resultSet=stmt.executeQuery();
+			     ResultSet resultSet2=stmt2.executeQuery())
+			{
+				while (resultSet.next())
+					availabilities.add(new Availability(Date.valueOf(
+							resultSet.getString("date")),
+					                                    resultSet.getBoolean("morningShift"),
+					                                    resultSet.getBoolean("noonShift")));
+				while (resultSet2.next())
+					qualifications.add(resultSet2.getString("job"));
+			}
+		}
 	}
 
 	/**
@@ -151,7 +171,6 @@ public class Employee
 			try (ResultSet resultSet=stmt.executeQuery())
 			{
 				if (resultSet.next())
-				{
 					return new Employee(resultSet.getInt("ID"),
 					                    resultSet.getString("firstName"),
 					                    resultSet.getString("lastName"),
@@ -161,7 +180,6 @@ public class Employee
 					                    resultSet.getInt("bankBrunchNum"),
 					                    resultSet.getInt("bankAccountNum")
 					);
-				}
 				else
 					return null;
 			}
@@ -260,7 +278,7 @@ public class Employee
 		return bankAccountNum;
 	}
 
-	public LinkedList<Availability> getAvailabilities()
+	public Collection<Availability> getAvailabilities()
 	{
 		return new LinkedList<>(availabilities);
 	}
@@ -326,7 +344,7 @@ public class Employee
 			stmt.setInt(1, getID());
 			try (ResultSet resultSet=stmt.executeQuery())
 			{
-				return DBTablePrinter.printResultSet(resultSet);
+				return DBTablePrinter.printResultSet(resultSet)+"availble at:\n"+availabilities+"\nqualified to:\n"+qualifications;
 			}
 		}
 		catch (SQLException e)
@@ -341,5 +359,9 @@ public class Employee
 		//		       ", Leaving date="+getLeavingDate()+
 		//		       ", Salary="+getSalary()+
 		//		       '}';
+	}
+
+	public static void init()
+	{
 	}
 }

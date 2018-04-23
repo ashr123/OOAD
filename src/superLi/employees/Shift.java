@@ -3,24 +3,23 @@ package superLi.employees;
 import superLi.DBTablePrinter;
 
 import java.sql.*;
-import java.sql.Date;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 public class Shift
 {
 	private static final String DB_CON_URL="jdbc:sqlite:mydb.db";
-	private Date date;
-	private Map<Employee, Collection<String>> employeeToJobsMap=new HashMap<>();
-	private boolean isMorningShift;
 
 	static
 	{
-		synchronized (Employee.class)
+		synchronized (Shift.class)
 		{
 			try (Connection conn=DriverManager.getConnection(DB_CON_URL);
 			     Statement stmt=conn.createStatement())
 			{
-//				stmt.executeUpdate("DROP TABLE IF EXISTS Shifts;");
+				//				stmt.executeUpdate("DROP TABLE IF EXISTS Shifts;");
 				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Shifts"+
 				                   "("+
 				                   "ID INTEGER references Employees(ID) ON DELETE NO ACTION, "+
@@ -38,6 +37,10 @@ public class Shift
 			}
 		}
 	}
+
+	private Date date;
+	private Map<Employee, Collection<String>> employeeToJobsMap=new HashMap<>();
+	private boolean isMorningShift;
 
 	private Shift(String day, String month, String year, boolean isMorningShift) throws SQLException
 	{
@@ -62,9 +65,7 @@ public class Shift
 				{
 					Employee employee=Employee.getEmployee(resultSet.getInt("ID"));
 					if (!employeeToJobsMap.containsKey(employee))
-					{
 						employeeToJobsMap.put(employee, new LinkedList<>());
-					}
 					if (!employeeToJobsMap.get(employee).contains(resultSet.getString("job")))
 						employeeToJobsMap.get(employee).add(resultSet.getString("job"));
 				}
@@ -85,7 +86,8 @@ public class Shift
 		}
 	}
 
-	public static void addEmployeeToShift(int ID, String day, String month, String year, boolean isMorningShift, String job)
+	public static void addEmployeeToShift(int ID, String day, String month, String year, boolean isMorningShift,
+	                                      String job)
 	{
 		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
 		     PreparedStatement stmt=conn.prepareStatement("SELECT * FROM WorkingHours WHERE "+
@@ -138,21 +140,6 @@ public class Shift
 		}
 	}
 
-	public Date getDate()
-	{
-		return new Date(date.getTime());
-	}
-
-	public Map<Employee, Collection<String>> getEmployeeToJobsMap()
-	{
-		return new HashMap<>(employeeToJobsMap);
-	}
-
-	public boolean isMorningShift()
-	{
-		return isMorningShift;
-	}
-
 	public static String showShiftAt(String day, String month, String year, boolean isMorningShift)
 	{
 		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
@@ -177,6 +164,21 @@ public class Shift
 		}
 	}
 
+	public Date getDate()
+	{
+		return new Date(date.getTime());
+	}
+
+	public Map<Employee, Collection<String>> getEmployeeToJobsMap()
+	{
+		return new HashMap<>(employeeToJobsMap);
+	}
+
+	public boolean isMorningShift()
+	{
+		return isMorningShift;
+	}
+
 	@Override
 	public String toString()
 	{
@@ -192,7 +194,9 @@ public class Shift
 			stmt.setBoolean(2, isMorningShift);
 			try (ResultSet resultSet=stmt.executeQuery())
 			{
-				return "Shift on date: "+date+", at "+(isMorningShift ? "morning" : "evening")+" details:\n"+DBTablePrinter.printResultSet(resultSet);
+				return "Shift on date: "+date+", at "+(isMorningShift ? "morning" : "evening")+" details:\n"+DBTablePrinter
+						                                                                                             .printResultSet(
+								                                                                                             resultSet);
 			}
 		}
 		catch (SQLException e)
@@ -200,5 +204,9 @@ public class Shift
 			System.err.println(e);//TODO: print a nicer message
 			return null;
 		}
+	}
+
+	public static void init()
+	{
 	}
 }
