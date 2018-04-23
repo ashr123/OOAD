@@ -57,31 +57,47 @@ public class ShiftTest
 	@Test
 	public void getShift()
 	{
-//		assertNotNull(Shift.getShift(LocalDate.now().getDayOfMonth()<10 ?
-//		                             "0"+LocalDate.now().getDayOfMonth() :
-//		                             LocalDate.now().getDayOfMonth()+"",
-//
-//		                             LocalDate.now().getMonthValue()<10 ?
-//		                             "0"+LocalDate.now().getMonthValue() :
-//		                             LocalDate.now().getMonthValue()+"",
-//
-//		                             LocalDate.now().getYear()+"",
-//		                             true));
+		assertNotNull(Shift.getShift(LocalDate.now().getDayOfMonth()<10 ?
+		                             "0"+LocalDate.now().getDayOfMonth() :
+		                             LocalDate.now().getDayOfMonth()+"",
+
+		                             LocalDate.now().getMonthValue()<10 ?
+		                             "0"+LocalDate.now().getMonthValue() :
+		                             LocalDate.now().getMonthValue()+"",
+
+		                             LocalDate.now().getYear()+"",
+		                             true));
 	}
 
 	@Test
 	public void addEmployeeToShift()
 	{
+		assertFalse(Shift.addEmployeeToShift(123456789,
+		                                    LocalDate.now().getDayOfMonth()<10 ?
+		                                    "0"+LocalDate.now().getDayOfMonth() :
+		                                    LocalDate.now().getDayOfMonth()+"",
 
+		                                    LocalDate.now().getMonthValue()<10 ?
+		                                    "0"+LocalDate.now().getMonthValue() :
+		                                    LocalDate.now().getMonthValue()+"",
+
+		                                    LocalDate.now().getYear()+"",
+		                                    true,
+		                                    "job1"));
 	}
 
 	@Test
 	public void isShiftExists()
 	{
-	}
+		assertTrue(Shift.isShiftExists(LocalDate.now().getDayOfMonth()<10 ?
+		                               "0"+LocalDate.now().getDayOfMonth() :
+		                               LocalDate.now().getDayOfMonth()+"",
 
-	@Test
-	public void showShiftAt()
-	{
+		                               LocalDate.now().getMonthValue()<10 ?
+		                               "0"+LocalDate.now().getMonthValue() :
+		                               LocalDate.now().getMonthValue()+"",
+
+		                               LocalDate.now().getYear()+"",
+		                               true));
 	}
 }

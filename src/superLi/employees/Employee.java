@@ -62,7 +62,7 @@ public class Employee
 			}
 			catch (SQLException e)
 			{
-				System.err.println(e);
+				System.err.println("Error building DB!!");
 				System.exit(1);
 			}
 		}
@@ -159,7 +159,7 @@ public class Employee
 		}
 		catch (SQLException e)
 		{
-			System.err.println(e);//TODO: print a nicer message
+			System.err.println("Error at adding an employee!!");
 			return false;
 		}
 	}
@@ -194,7 +194,7 @@ public class Employee
 		}
 		catch (SQLException e)
 		{
-			System.err.println(e);//TODO: print a nicer message
+			System.err.println("Error at getting an employee!!");
 			return null;
 		}
 	}
@@ -215,7 +215,7 @@ public class Employee
 		}
 		catch (SQLException e)
 		{
-			System.err.println(e);//TODO: print a nicer message
+			System.err.println("Error at adding Availability!!");
 			return false;
 		}
 	}
@@ -232,7 +232,7 @@ public class Employee
 		}
 		catch (SQLException e)
 		{
-			System.err.println(e);//TODO: print a nicer message
+			System.err.println("Error at getting Qualification!!");
 			return false;
 		}
 	}
@@ -263,7 +263,7 @@ public class Employee
 		}
 		catch (SQLException e)
 		{
-			System.err.println(e);//TODO: print a nicer message
+			System.err.println("Error at showing Available Employees To Shift!!");
 			return null;
 		}
 	}
@@ -279,7 +279,7 @@ public class Employee
 		}
 		catch (SQLException e)
 		{
-			System.err.println(e);//TODO: print a nicer message
+			System.err.println("Error at adding job");
 			return false;
 		}
 	}
@@ -374,7 +374,7 @@ public class Employee
 		}
 		catch (SQLException e)
 		{
-			System.err.println(e);//TODO: print a nicer message
+			System.err.println("Error at updating an employee!!");
 			return false;
 		}
 	}
@@ -400,7 +400,7 @@ public class Employee
 		}
 		catch (SQLException e)
 		{
-			System.err.println(e);//TODO: print a nicer message
+			System.err.println("Error at Employee toString!!");
 			return null;
 		}
 		//		return "Employee{"+

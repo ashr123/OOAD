@@ -21,17 +21,17 @@ public class Shift
 //				stmt.executeUpdate("DROP TABLE IF EXISTS Shifts;");
 				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Shifts"+
 				                   "("+
-				                   "ID INTEGER REFERENCES Employees(ID) ON DELETE NO ACTION, "+
+				                   "ID INTEGER REFERENCES Employees(ID) ON DELETE CASCADE , "+
 				                   "date TEXT NOT NULL CHECK (DATE(date)>=DATE('now')), "+
 				                   "isMorningShift BOOLEAN NOT NULL, "+
-				                   "job TEXT REFERENCES Jobs(job) ON DELETE NO ACTION, "+
+				                   "job TEXT REFERENCES Jobs(job) ON DELETE CASCADE, "+
 				                   "PRIMARY KEY(ID, date, isMorningShift, job)"+
 				                   ");"
 				                  );
 			}
 			catch (SQLException e)
 			{
-				System.err.println(e);
+				System.err.println("Error at building the Shift table!!");
 				System.exit(1);
 			}
 		}
@@ -87,12 +87,12 @@ public class Shift
 		}
 		catch (SQLException e)
 		{
-			System.err.println(e);//TODO: print a nicer message
+			System.err.println("Error at getting a shift!!");
 			return null;
 		}
 	}
 
-	public static void addEmployeeToShift(int ID, String day, String month, String year, boolean isMorningShift,
+	public static boolean addEmployeeToShift(int ID, String day, String month, String year, boolean isMorningShift,
 	                                      String job)
 	{
 		try (Connection conn=getConnection();
@@ -118,10 +118,12 @@ public class Shift
 						stmt2.executeUpdate();
 					}
 			}
+			return true;
 		}
 		catch (SQLException e)
 		{
-			System.err.println(e);//TODO: print a nicer message
+			System.err.println("Error at adding an employee to shift");
+			return false;
 		}
 	}
 
@@ -141,7 +143,7 @@ public class Shift
 		}
 		catch (SQLException e)
 		{
-			System.err.println(e);//TODO: print a nicer message
+			System.err.println("Error at checking if a shift exists!!");
 			return false;
 		}
 	}
@@ -165,7 +167,7 @@ public class Shift
 		}
 		catch (SQLException e)
 		{
-			System.err.println(e);//TODO: print a nicer message
+			System.err.println(e);
 			return null;
 		}
 	}
@@ -204,14 +206,12 @@ public class Shift
 			stmt.setBoolean(2, isMorningShift);
 			try (ResultSet resultSet=stmt.executeQuery())
 			{
-				return "Shift on date: "+date+", at "+(isMorningShift ? "morning" : "evening")+" details:\n"+DBTablePrinter
-						                                                                                             .printResultSet(
-								                                                                                             resultSet);
+				return "Shift on date: "+date+", at "+(isMorningShift ? "morning" : "evening")+" details:\n"+DBTablePrinter.printResultSet(resultSet);
 			}
 		}
 		catch (SQLException e)
 		{
-			System.err.println(e);//TODO: print a nicer message
+			System.err.println(e);
 			return null;
 		}
 	}
