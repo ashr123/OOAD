@@ -1,5 +1,6 @@
 package superLi.employees;
 
+import org.sqlite.SQLiteConfig;
 import superLi.DBTablePrinter;
 
 import java.sql.*;
@@ -12,23 +13,15 @@ import java.util.LinkedList;
  */
 public class Employee
 {
-	private static final String DB_CON_URL="jdbc:sqlite:mydb.db";
-	private final int ID;
-	private String firstName, lastName;
-	private Date startingDate;
-	private double salary;
-	private int bankNum, bankBrunchNum, bankAccountNum;
-	private Collection<Availability> availabilities=new LinkedList<>();
-	private Collection<String> qualifications=new LinkedList<>();
-
 	//Initiates the DB for the first time if not exists.
 	static
 	{
 		synchronized (Employee.class)
 		{
-			try (Connection conn=DriverManager.getConnection(DB_CON_URL);
+			try (Connection conn=getConnection();
 			     Statement stmt=conn.createStatement())
 			{
+				stmt.execute("PRAGMA foreign_keys=ON");
 //				stmt.executeUpdate("DROP TABLE IF EXISTS Employees;");
 //				stmt.executeUpdate("DROP TABLE IF EXISTS WorkingHours;");
 //				stmt.executeUpdate("DROP TABLE IF EXISTS jobs;");
@@ -63,7 +56,7 @@ public class Employee
 				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Qualifications"+
 				                   "("+
 				                   "ID INTEGER REFERENCES Employees(ID) ON DELETE CASCADE, "+
-				                   "job TEXT references Jobs(job) ON DELETE CASCADE, "+
+				                   "job TEXT REFERENCES Jobs(job) ON DELETE CASCADE, "+
 				                   "PRIMARY KEY (ID, job)"+
 				                   ");");
 			}
@@ -75,6 +68,14 @@ public class Employee
 		}
 	}
 
+	private final int ID;
+	private String firstName, lastName;
+	private Date startingDate;
+	private double salary;
+	private int bankNum, bankBranchNum, bankAccountNum;
+	private Collection<Availability> availabilities=new LinkedList<>();
+	private Collection<String> qualifications=new LinkedList<>();
+
 	/**
 	 * Constructor<br>
 	 * Private because it's not allowed to create an independent {@link Employee} outside the DB.
@@ -85,11 +86,11 @@ public class Employee
 	 * @param startingDate   date of commencement of employing an employee
 	 * @param salary         the salary of the employee
 	 * @param bankNum        number of the employee's bank
-	 * @param bankBrunchNum  number of the employee's bank's brunch
+	 * @param bankBranchNum  number of the employee's bank's brunch
 	 * @param bankAccountNum number of the employee's bank account
 	 */
 	private Employee(int ID, String firstName, String lastName, Date startingDate, double salary,
-	                 int bankNum, int bankBrunchNum, int bankAccountNum) throws SQLException
+	                 int bankNum, int bankBranchNum, int bankAccountNum) throws SQLException
 	{
 		this.ID=ID;
 		this.firstName=firstName;
@@ -97,12 +98,12 @@ public class Employee
 		this.startingDate=startingDate;
 		this.salary=salary;
 		this.bankNum=bankNum;
-		this.bankBrunchNum=bankBrunchNum;
+		this.bankBranchNum=bankBranchNum;
 		this.bankAccountNum=bankAccountNum;
-		try(Connection conn=DriverManager.getConnection(DB_CON_URL);
-		    PreparedStatement stmt=conn.prepareStatement(
-				    "SELECT date, morningShift, noonShift FROM WorkingHours WHERE ID=?;");
-		    PreparedStatement stmt2=conn.prepareStatement("SELECT job FROM Qualifications WHERE ID=?"))
+		try (Connection conn=getConnection();
+		     PreparedStatement stmt=conn.prepareStatement(
+				     "SELECT date, morningShift, noonShift FROM WorkingHours WHERE ID=?;");
+		     PreparedStatement stmt2=conn.prepareStatement("SELECT job FROM Qualifications WHERE ID=?"))
 		{
 			stmt.setInt(1, ID);
 			stmt2.setInt(1, ID);
@@ -120,6 +121,13 @@ public class Employee
 		}
 	}
 
+	private static Connection getConnection() throws SQLException
+	{
+		SQLiteConfig config=new SQLiteConfig();
+		config.enforceForeignKeys(true);
+		return DriverManager.getConnection("jdbc:sqlite:mydb.db", config.toProperties());
+	}
+
 	/**
 	 * Adds a new employee to the store
 	 *
@@ -128,23 +136,23 @@ public class Employee
 	 * @param lastName       the last name of the employee
 	 * @param salary         the salary of the employee
 	 * @param bankNum        number of the employee's bank
-	 * @param bankBrunchNum  number of the employee's bank's brunch
+	 * @param bankBranchNum  number of the employee's bank's brunch
 	 * @param bankAccountNum number of the employee's bank account
 	 * @return {@code true} if the employee was added successfully to the DB, {@code false} otherwise
 	 */
 	public static boolean addEmployee(int ID, String firstName, String lastName, double salary, int bankNum,
-	                                  int bankBrunchNum, int bankAccountNum)
+	                                  int bankBranchNum, int bankAccountNum)
 	{
-		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
+		try (Connection conn=getConnection();
 		     PreparedStatement stmt=conn.prepareStatement(
-				     "INSERT INTO Employees (ID, firstName, lastName, salary, startingDate, bankNum, bankBrunchNum, bankAccountNum) VALUES (?, ?, ?, ?, date('now'), ?, ?, ?);"))
+				     "INSERT INTO Employees (ID, firstName, lastName, salary, startingDate, bankNum, bankBranchNum, bankAccountNum) VALUES (?, ?, ?, ?, date('now'), ?, ?, ?);"))
 		{
 			stmt.setInt(1, ID);
 			stmt.setString(2, firstName.trim());
 			stmt.setString(3, lastName.trim());
 			stmt.setDouble(4, salary);
 			stmt.setInt(5, bankNum);
-			stmt.setInt(6, bankBrunchNum);
+			stmt.setInt(6, bankBranchNum);
 			stmt.setInt(7, bankAccountNum);
 			stmt.executeUpdate();
 			return true;
@@ -164,7 +172,7 @@ public class Employee
 	 */
 	public static Employee getEmployee(int ID)
 	{
-		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
+		try (Connection conn=getConnection();
 		     PreparedStatement stmt=conn.prepareStatement("SELECT * FROM Employees WHERE ID=?;"))
 		{
 			stmt.setInt(1, ID);
@@ -177,7 +185,7 @@ public class Employee
 					                    Date.valueOf(resultSet.getString("startingDate")),
 					                    resultSet.getDouble("salary"),
 					                    resultSet.getInt("bankNum"),
-					                    resultSet.getInt("bankBrunchNum"),
+					                    resultSet.getInt("bankBranchNum"),
 					                    resultSet.getInt("bankAccountNum")
 					);
 				else
@@ -191,21 +199,59 @@ public class Employee
 		}
 	}
 
+	public static boolean addAvailability(int ID, String day, String month, String year, boolean isMorningShift,
+	                                      boolean isNoonShift)
+	{
+		try (Connection conn=getConnection();
+		     PreparedStatement stmt=conn.prepareStatement("INSERT INTO WorkingHours (ID, date, morningShift, "+
+		                                                  "noonShift) VALUES (?, ?, ?, ?);"))
+		{
+			stmt.setInt(1, ID);
+			stmt.setString(2, year+'-'+month+'-'+day);
+			stmt.setBoolean(3, isMorningShift);
+			stmt.setBoolean(4, isNoonShift);
+			stmt.executeUpdate();
+			return true;
+		}
+		catch (SQLException e)
+		{
+			System.err.println(e);//TODO: print a nicer message
+			return false;
+		}
+	}
+
+	public static boolean addQualification(int ID, String job)
+	{
+		try (Connection conn=getConnection();
+		     PreparedStatement stmt=conn.prepareStatement("INSERT INTO Qualifications (ID, job) VALUES (?, ?);"))
+		{
+			stmt.setInt(1, ID);
+			stmt.setString(2, job);
+			stmt.executeUpdate();
+			return true;
+		}
+		catch (SQLException e)
+		{
+			System.err.println(e);//TODO: print a nicer message
+			return false;
+		}
+	}
+
 	public static String showAvailableEmployeesToShift(String day, String month, String year, boolean isMorningShift,
 	                                                   String job)
 	{
-		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
+		try (Connection conn=getConnection();
 		     PreparedStatement stmt=conn.prepareStatement(isMorningShift ?
 		                                                  "SELECT Employees.ID, firstName, lastName "+
 		                                                  "FROM Employees, WorkingHours, Qualifications "+
 		                                                  "WHERE DATE(date)=DATE(?) AND "+
-		                                                  "MorningShift is TRUE AND "+
+		                                                  "MorningShift AND "+
 		                                                  "Qualifications.job=?;" :
 
 		                                                  "SELECT Employees.ID, firstName, lastName "+
 		                                                  "FROM Employees, WorkingHours, Qualifications "+
 		                                                  "WHERE DATE(date)=DATE(?) AND "+
-		                                                  "noonShift is TRUE AND "+
+		                                                  "noonShift AND "+
 		                                                  "Qualifications.job=?;"))
 		{
 			stmt.setString(1, year+'-'+month+'-'+day);
@@ -224,7 +270,7 @@ public class Employee
 
 	public static boolean addJob(String job)
 	{
-		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
+		try (Connection conn=getConnection();
 		     PreparedStatement stmt=conn.prepareStatement("INSERT INTO jobs (job) VALUES (?);"))
 		{
 			stmt.setString(1, job);
@@ -236,6 +282,10 @@ public class Employee
 			System.err.println(e);//TODO: print a nicer message
 			return false;
 		}
+	}
+
+	public static void init()
+	{
 	}
 
 	public int getID()
@@ -268,9 +318,9 @@ public class Employee
 		return bankNum;
 	}
 
-	public int getBankBrunchNum()
+	public int getbankBranchNum()
 	{
-		return bankBrunchNum;
+		return bankBranchNum;
 	}
 
 	public int getBankAccountNum()
@@ -297,12 +347,12 @@ public class Employee
 	public synchronized boolean updateEmployee(String firstName, String lastName, double salary, int bankNum,
 	                                           int bankBranchNum, int bankAccountNum)
 	{
-		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
+		try (Connection conn=getConnection();
 		     PreparedStatement stmt=conn.prepareStatement("UPDATE Employees SET firstName=?, "+
 		                                                  "lastName=?, "+
 		                                                  "salary=?, "+
 		                                                  "bankNum=?, "+
-		                                                  "bankBrunchNum=?, "+
+		                                                  "bankBranchNum=?, "+
 		                                                  "bankAccountNum=? "+
 		                                                  "WHERE ID=?;"))
 		{
@@ -318,7 +368,7 @@ public class Employee
 			this.lastName=lastName;
 			this.salary=salary;
 			this.bankNum=bankNum;
-			this.bankBrunchNum=bankBranchNum;
+			this.bankBranchNum=bankBranchNum;
 			this.bankAccountNum=bankAccountNum;
 			return true;
 		}
@@ -338,13 +388,14 @@ public class Employee
 	@Override
 	public synchronized String toString()
 	{
-		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
+		try (Connection conn=getConnection();
 		     PreparedStatement stmt=conn.prepareStatement("SELECT * FROM Employees WHERE ID=?;"))
 		{
 			stmt.setInt(1, getID());
 			try (ResultSet resultSet=stmt.executeQuery())
 			{
-				return DBTablePrinter.printResultSet(resultSet)+"availble at:\n"+availabilities+"\nqualified to:\n"+qualifications;
+				return DBTablePrinter.printResultSet(
+						resultSet)+"availble at:\n"+availabilities+"\nqualified to:\n"+qualifications;
 			}
 		}
 		catch (SQLException e)
@@ -359,9 +410,5 @@ public class Employee
 		//		       ", Leaving date="+getLeavingDate()+
 		//		       ", Salary="+getSalary()+
 		//		       '}';
-	}
-
-	public static void init()
-	{
 	}
 }

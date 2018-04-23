@@ -19,7 +19,8 @@ public class Main
 			double salary;
 			String fname, lname, year, month, day, cIsMorningShift;
 			boolean isMorningShift=false;
-			System.out.println("Enter command: 'add'/'update'/'get'/'addworking'/'addjob'/'addshift'/'showshift'/'exit':");
+			System.out.println("Enter command: 'add'/'update'/'get'/'addworking'/'addqualification'/'addjob'/'addshift'/'showshift" +
+			                   "'/'exit':");
 			String comm=sc.nextLine().trim();
 
 			switch (comm)
@@ -70,7 +71,15 @@ public class Main
 					id=Integer.parseInt(sc.nextLine());
 					System.out.println(Employee.getEmployee(id));
 					break;
-				case "addworking"://TODO complete
+				case "addqualification":
+					System.out.print("Id: ");
+					id=sc.nextInt();
+					System.out.print("Enter job: ");
+					Employee.addQualification(id, sc.nextLine());
+					break;
+				case "addworking":
+					System.out.print("Id: ");
+					id=sc.nextInt();
 					System.out.print("Enter year (yyyy): ");
 					year=sc.nextLine();
 					System.out.print("Enter month (mm): ");
@@ -80,8 +89,10 @@ public class Main
 					System.out.print("Is it a morning shift? (y/n): ");
 					cIsMorningShift=sc.nextLine();
 					isMorningShift=cIsMorningShift.equals("y");
-
-//					System.out.println(Employee.seeAvailableEmployeesForShift(day, month, year, isMorningShift));
+					System.out.print("Is it a noon shift? (y/n): ");
+					cIsMorningShift=sc.nextLine();
+					boolean isNoonShift=cIsMorningShift.equals("y");
+					Employee.addAvailability(id, day, month, year, isMorningShift, isNoonShift);
 					break;
 				case "addjob":
 					System.out.print("Enter job: ");

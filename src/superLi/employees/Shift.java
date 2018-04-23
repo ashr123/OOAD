@@ -1,5 +1,6 @@
 package superLi.employees;
 
+import org.sqlite.SQLiteConfig;
 import superLi.DBTablePrinter;
 
 import java.sql.*;
@@ -10,22 +11,20 @@ import java.util.Map;
 
 public class Shift
 {
-	private static final String DB_CON_URL="jdbc:sqlite:mydb.db";
-
 	static
 	{
 		synchronized (Shift.class)
 		{
-			try (Connection conn=DriverManager.getConnection(DB_CON_URL);
+			try (Connection conn=getConnection();
 			     Statement stmt=conn.createStatement())
 			{
-				//				stmt.executeUpdate("DROP TABLE IF EXISTS Shifts;");
+//				stmt.executeUpdate("DROP TABLE IF EXISTS Shifts;");
 				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Shifts"+
 				                   "("+
-				                   "ID INTEGER references Employees(ID) ON DELETE NO ACTION, "+
+				                   "ID INTEGER REFERENCES Employees(ID) ON DELETE NO ACTION, "+
 				                   "date TEXT NOT NULL CHECK (DATE(date)>=DATE('now')), "+
 				                   "isMorningShift BOOLEAN NOT NULL, "+
-				                   "job TEXT references Jobs(job) ON DELETE NO ACTION, "+
+				                   "job TEXT REFERENCES Jobs(job) ON DELETE NO ACTION, "+
 				                   "PRIMARY KEY(ID, date, isMorningShift, job)"+
 				                   ");"
 				                  );
@@ -44,7 +43,7 @@ public class Shift
 
 	private Shift(String day, String month, String year, boolean isMorningShift) throws SQLException
 	{
-		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
+		try (Connection conn=getConnection();
 		     PreparedStatement stmt=conn.prepareStatement("SELECT ID, job FROM Shifts "+
 		                                                  "WHERE "+
 		                                                  "DATE(date)=DATE(?) AND "+
@@ -73,6 +72,13 @@ public class Shift
 		}
 	}
 
+	private static Connection getConnection() throws SQLException
+	{
+		SQLiteConfig config=new SQLiteConfig();
+		config.enforceForeignKeys(true);
+		return DriverManager.getConnection("jdbc:sqlite:mydb.db", config.toProperties());
+	}
+
 	public static Shift getShift(String day, String month, String year, boolean isMorningShift)
 	{
 		try
@@ -89,7 +95,7 @@ public class Shift
 	public static void addEmployeeToShift(int ID, String day, String month, String year, boolean isMorningShift,
 	                                      String job)
 	{
-		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
+		try (Connection conn=getConnection();
 		     PreparedStatement stmt=conn.prepareStatement("SELECT * FROM WorkingHours WHERE "+
 		                                                  "DATE(date)=DATE(?) AND "+
 		                                                  "morningShift is ? AND ID=?"))
@@ -121,7 +127,7 @@ public class Shift
 
 	public static boolean isShiftExists(String day, String month, String year, boolean isMorningShift)
 	{
-		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
+		try (Connection conn=getConnection();
 		     PreparedStatement stmt=conn.prepareStatement("SELECT * FROM Shifts WHERE "+
 		                                                  "DATE(date)=DATE(?) AND "+
 		                                                  "isMorningShift is ?;"))
@@ -142,7 +148,7 @@ public class Shift
 
 	public static String showShiftAt(String day, String month, String year, boolean isMorningShift)
 	{
-		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
+		try (Connection conn=getConnection();
 		     PreparedStatement stmt=conn.prepareStatement("SELECT Employees.ID, firstName, lastName, "+
 		                                                  "job FROM "+
 		                                                  "Employees, Shifts "+
@@ -164,6 +170,10 @@ public class Shift
 		}
 	}
 
+	public static void init()
+	{
+	}
+
 	public Date getDate()
 	{
 		return new Date(date.getTime());
@@ -182,7 +192,7 @@ public class Shift
 	@Override
 	public String toString()
 	{
-		try (Connection conn=DriverManager.getConnection(DB_CON_URL);
+		try (Connection conn=getConnection();
 		     PreparedStatement stmt=conn.prepareStatement("SELECT Employees.ID, firstName, lastName, "+
 		                                                  "job FROM "+
 		                                                  "Employees, Shifts "+
@@ -204,9 +214,5 @@ public class Shift
 			System.err.println(e);//TODO: print a nicer message
 			return null;
 		}
-	}
-
-	public static void init()
-	{
 	}
 }
