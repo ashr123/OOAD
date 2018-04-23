@@ -27,7 +27,7 @@ public class Main
 			{
 				case "add":
 					System.out.print("Id: ");
-					id=sc.nextInt();
+					id=Integer.parseInt(sc.nextLine());
 					System.out.print("First name: ");
 					fname=sc.nextLine();
 					System.out.print("Last name: ");
@@ -35,17 +35,17 @@ public class Main
 					System.out.print("Salary: ");
 					salary=sc.nextDouble();
 					System.out.print("Bank number: ");
-					bankNum=sc.nextInt();
+					bankNum=Integer.parseInt(sc.nextLine());
 					System.out.print("Bank brunch number: ");
-					bankBranchNum=sc.nextInt();
+					bankBranchNum=Integer.parseInt(sc.nextLine());
 					System.out.print("Bank account number: ");
-					bankAccountNum=sc.nextInt();
+					bankAccountNum=Integer.parseInt(sc.nextLine());
 					if (Employee.addEmployee(id, fname, lname, salary, bankNum, bankBranchNum, bankAccountNum))
 						System.out.println("success");
 					break;
 				case "update":
 					System.out.print("Id: ");
-					id=sc.nextInt();
+					id=Integer.parseInt(sc.nextLine());
 					Employee emp=Employee.getEmployee(id);
 					if (emp==null)
 					{
@@ -59,9 +59,9 @@ public class Main
 					System.out.print("Salary: ");
 					salary=sc.nextDouble();
 					System.out.print("Bank number: ");
-					bankNum=sc.nextInt();
+					bankNum=Integer.parseInt(sc.nextLine());
 					System.out.print("Bank brunch number: ");
-					bankBranchNum=sc.nextInt();
+					bankBranchNum=Integer.parseInt(sc.nextLine());
 					System.out.print("Bank account number: ");
 					bankAccountNum=Integer.parseInt(sc.nextLine());
 					emp.updateEmployee(fname, lname, salary, bankNum, bankBranchNum, bankAccountNum);
@@ -73,13 +73,13 @@ public class Main
 					break;
 				case "addqualification":
 					System.out.print("Id: ");
-					id=sc.nextInt();
+					id=Integer.parseInt(sc.nextLine());
 					System.out.print("Enter job: ");
 					Employee.addQualification(id, sc.nextLine());
 					break;
 				case "addworking":
 					System.out.print("Id: ");
-					id=sc.nextInt();
+					id=Integer.parseInt(sc.nextLine());
 					System.out.print("Enter year (yyyy): ");
 					year=sc.nextLine();
 					System.out.print("Enter month (mm): ");
@@ -133,7 +133,7 @@ public class Main
 						                                                          isMorningShift,
 						                                                          job));
 						System.out.print("Enter employee ID: ");
-						id=sc.nextInt();
+						id=Integer.parseInt(sc.nextLine());
 						Shift.addEmployeeToShift(id, day, month, year, isMorningShift, job);
 						System.out.print("Enter job (q to stop): ");
 						job=sc.nextLine();
