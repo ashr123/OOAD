@@ -99,8 +99,6 @@ public class Main
 					Employee.addJob(sc.nextLine());
 					break;
 				case "addshift":
-//					System.out.print("Id: ");
-//					id=Integer.parseInt(sc.nextLine());
 					System.out.print("Enter year (yyyy): ");
 					year=sc.nextLine();
 					System.out.print("Enter month (mm): ");
@@ -110,7 +108,7 @@ public class Main
 					System.out.print("Is it a morning shift? (y/n): ");
 					cIsMorningShift=sc.nextLine();
 					isMorningShift=cIsMorningShift.equals("y");
-					if (Shift.isShiftExists(day, month, year,isMorningShift))
+					if (!Shift.isShiftExists(day, month, year,isMorningShift))
 					{
 						System.out.println("Available managers for this shift:\n"+
 						                   Employee.showAvailableEmployeesToShift(day,

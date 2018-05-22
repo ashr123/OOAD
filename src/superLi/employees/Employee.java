@@ -58,7 +58,61 @@ public class Employee
 				                   "ID INTEGER REFERENCES Employees(ID) ON DELETE CASCADE, "+
 				                   "job TEXT REFERENCES Jobs(job) ON DELETE CASCADE, "+
 				                   "PRIMARY KEY (ID, job)"+
-				                   ");");
+				                   ");"
+				                  );
+				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS DRIVERS ("
+				                   +"	ID integer PRIMARY KEY REFERENCES Employees(ID),"
+				                   +"	LICENCE_KIND integer NOT NULL"
+				                   +");"
+				                  );
+				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS TRUCKS ("
+				                   +"	ID integer PRIMARY KEY,"
+				                   +"	MODEL text NOT NULL, "
+				                   +"	COLOR text NOT NULL, "
+				                   +"	NETO_WEIGHT integer NOT NULL,"
+				                   +"	MAX_WEIGHT integer NOT NULL "
+				                   +");"
+				                  );
+				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS TRANSPORTAIONS ("
+				                   +"	ID integer PRIMARY KEY,"
+				                   +"	TRUCK_ID integer NOT NULL,"
+				                   +"	DRIVER_ID integer NOT NULL,"
+				                   +"	DEAPARTURE_TIME text NOT NULL, "
+				                   +"	DEAPARTURE_DATE text NOT NULL, "
+				                   +" FOREIGN KEY(DRIVER_ID) REFERENCES DRIVERS(ID), "
+				                   +" FOREIGN KEY(TRUCK_ID) REFERENCES TRUCKS(ID)"
+				                   +");"
+				                  );
+				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS TRANSPORT_DESTINATIONS ("
+				                   +"	TRANSPORT_ID integer NOT NULL,"
+				                   +"	SOURCE_ID integer NOT NULL, "
+				                   +"	DESTINATION_ID integer NOT NULL, "
+				                   +" FOREIGN KEY(SOURCE_ID) REFERENCES SOURCES(ID), "
+				                   +" FOREIGN KEY(DESTINATION_ID) REFERENCES DESTINATIONS(ID), "
+				                   +" FOREIGN KEY(TRANSPORT_ID) REFERENCES TRANSPORTAIONS(ID) "
+				                   +");"
+				                  );
+				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS DESTINATIONS ("
+				                   +"	ID integer PRIMARY KEY,"
+				                   +"	ADDRESS text NOT NULL,"
+				                   +"	CONTACT_NAME text NOT NULL, "
+				                   +"	CONTACT_PHONE integer NOT NULL, "
+				                   +"	DELIVERY_AREA text NOT NULL"
+				                   +");"
+				                  );
+				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS SOURCES ("
+				                   +"	ID integer PRIMARY KEY,"
+				                   +"	ADDRESS text NOT NULL,"
+				                   +"	CONTACT_NAME text NOT NULL, "
+				                   +"	CONTACT_PHONE integer NOT NULL"
+				                   +");"
+				                  );
+				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS RESERVATION_DOCUMENTS ("
+				                   +"	ID integer PRIMARY KEY,"
+				                   +"	TRANSPORT_ID integer NOT NULL, "
+				                   +" FOREIGN KEY(TRANSPORT_ID) REFERENCES TRANSPORTAIONS(ID)"
+				                   +");"
+				                  );
 			}
 			catch (SQLException e)
 			{
@@ -89,8 +143,8 @@ public class Employee
 	 * @param bankBranchNum  number of the employee's bank's brunch
 	 * @param bankAccountNum number of the employee's bank account
 	 */
-	private Employee(int ID, String firstName, String lastName, Date startingDate, double salary,
-	                 int bankNum, int bankBranchNum, int bankAccountNum) throws SQLException
+	protected Employee(int ID, String firstName, String lastName, Date startingDate, double salary,
+	                   int bankNum, int bankBranchNum, int bankAccountNum) throws SQLException
 	{
 		this.ID=ID;
 		this.firstName=firstName;
@@ -140,8 +194,7 @@ public class Employee
 	 * @param bankAccountNum number of the employee's bank account
 	 * @return {@code true} if the employee was added successfully to the DB, {@code false} otherwise
 	 */
-	public static boolean addEmployee(int ID, String firstName, String lastName, double salary, int bankNum,
-	                                  int bankBranchNum, int bankAccountNum)
+	public static boolean addEmployee(int ID, String firstName, String lastName, double salary, int bankNum, int bankBranchNum, int bankAccountNum)
 	{
 		try (Connection conn=getConnection();
 		     PreparedStatement stmt=conn.prepareStatement(
@@ -199,12 +252,10 @@ public class Employee
 		}
 	}
 
-	public static boolean addAvailability(int ID, String day, String month, String year, boolean isMorningShift,
-	                                      boolean isNoonShift)
+	public static boolean addAvailability(int ID, String day, String month, String year, boolean isMorningShift, boolean isNoonShift)
 	{
 		try (Connection conn=getConnection();
-		     PreparedStatement stmt=conn.prepareStatement("INSERT INTO WorkingHours (ID, date, morningShift, "+
-		                                                  "noonShift) VALUES (?, ?, ?, ?);"))
+		     PreparedStatement stmt=conn.prepareStatement("INSERT INTO WorkingHours (ID, date, morningShift, noonShift) VALUES (?, ?, ?, ?);"))
 		{
 			stmt.setInt(1, ID);
 			stmt.setString(2, year+'-'+month+'-'+day);
@@ -344,8 +395,7 @@ public class Employee
 	 * @param bankAccountNum number of the employee's bank account
 	 * @return {@code true} if the update was successful, {@code false} otherwise
 	 */
-	public synchronized boolean updateEmployee(String firstName, String lastName, double salary, int bankNum,
-	                                           int bankBranchNum, int bankAccountNum)
+	public synchronized boolean updateEmployee(String firstName, String lastName, double salary, int bankNum, int bankBranchNum, int bankAccountNum)
 	{
 		try (Connection conn=getConnection();
 		     PreparedStatement stmt=conn.prepareStatement("UPDATE Employees SET firstName=?, "+

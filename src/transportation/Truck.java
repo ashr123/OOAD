@@ -1,5 +1,4 @@
-package Transportation;
-import java.util.Scanner;
+package transportation;
 
 public class Truck {
 	private int ID;

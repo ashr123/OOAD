@@ -1,5 +1,4 @@
-package Transportation;
-import java.util.LinkedList;
+package transportation;
 
 public class ReservationDocument {
 	private int ID;

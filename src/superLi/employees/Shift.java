@@ -92,8 +92,7 @@ public class Shift
 		}
 	}
 
-	public static boolean addEmployeeToShift(int ID, String day, String month, String year, boolean isMorningShift,
-	                                      String job)
+	public static boolean addEmployeeToShift(int ID, String day, String month, String year, boolean isMorningShift, String job)
 	{
 		try (Connection conn=getConnection();
 		     PreparedStatement stmt=conn.prepareStatement("SELECT * FROM WorkingHours WHERE "+

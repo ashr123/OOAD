@@ -1,17 +1,16 @@
-package Transportation;
+package transportation;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.Scanner;
 
 import org.sqlite.SQLiteConfig;
 
 public class DataBaseManager{
-	public static final String DB_URL = "jdbc:sqlite:database.db";  
+	public static final String DB_URL = "jdbc:sqlite:mydb.db";
 	public static final String DRIVER = "org.sqlite.JDBC";  
 	public void createNewDatabase(String fileName) {
 
@@ -43,161 +42,6 @@ public class DataBaseManager{
 		
 		return conn;
 	}
-	
-	public void createTables() {
-		createTrucksTable();
-		createDriversTable();
-		createTransportaionsTable();
-		createTransportDestinationsTable();
-		createDestinationsTable();
-		createSourcesTable();
-		createReservationDocumentsTable();
-		
-	}
-	
-	private void createReservationDocumentsTable() {
-		   // SQL statement for creating a new table
-        String sql = "CREATE TABLE IF NOT EXISTS RESERVATION_DOCUMENTS (\n"
-                + "	ID integer PRIMARY KEY,\n"
-                + "	TRANSPORT_ID integer NOT NULL, \n"
-                + " FOREIGN KEY(TRANSPORT_ID) REFERENCES TRANSPORTAIONS(ID) \n"
-                + ");";
-        
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-                Statement stmt = conn.createStatement()) {
-            // create a new table
-
-            stmt.execute(sql);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-		
-	}
-
-	private void createSourcesTable() {
-		   String sql = "CREATE TABLE IF NOT EXISTS SOURCES (\n"
-				    + "	ID integer PRIMARY KEY,\n"
-	                + "	ADDRESS text NOT NULL,\n"
-	                + "	CONTACT_NAME text NOT NULL, \n"
-	                + "	CONTACT_PHONE integer NOT NULL\n"
-	                + ");";
-	        
-	        try (Connection conn = DriverManager.getConnection(DB_URL);
-	                Statement stmt = conn.createStatement()) {
-	            // create a new table
-
-	            stmt.execute(sql);
-	        } catch (SQLException e) {
-	        }
-		
-	}
-	
-	private void createDestinationsTable() {
-		 String sql = "CREATE TABLE IF NOT EXISTS DESTINATIONS (\n"
-	                + "	ID integer PRIMARY KEY,\n"
-	                + "	ADDRESS text NOT NULL,\n"
-	                + "	CONTACT_NAME text NOT NULL, \n"
-	                + "	CONTACT_PHONE integer NOT NULL, \n"
-	                + "	DELIVERY_AREA text NOT NULL \n"
-	                + ");";
-	        
-	        try (Connection conn = DriverManager.getConnection(DB_URL);
-	                Statement stmt = conn.createStatement()) {
-	            // create a new table
-
-	            stmt.execute(sql);
-	        } catch (SQLException e) {
-	        }
-		
-	}
-
-	public void createTransportaionsTable() {
-
-        // SQL statement for creating a new table
-        String sql = "CREATE TABLE IF NOT EXISTS TRANSPORTAIONS (\n"
-                + "	ID integer PRIMARY KEY,\n"
-                + "	TRUCK_ID integer NOT NULL,\n"
-                + "	DRIVER_ID integer NOT NULL,\n"
-                + "	DEAPARTURE_TIME text NOT NULL, \n"
-                + "	DEAPARTURE_DATE text NOT NULL, \n"
-                + " FOREIGN KEY(DRIVER_ID) REFERENCES DRIVERS(ID), \n"
-                + " FOREIGN KEY(TRUCK_ID) REFERENCES TRUCKS(ID) \n"
-                + ");";
-        
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-                Statement stmt = conn.createStatement()) {
-            // create a new table
-
-            stmt.execute(sql);
-        } catch (SQLException e) {
-        }
-
-    }
-	
-	public void createTrucksTable() {
-   
-        // SQL statement for creating a new table
-        String sql = "CREATE TABLE IF NOT EXISTS TRUCKS (\n"
-                + "	ID integer PRIMARY KEY,\n"
-                + "	MODEL text NOT NULL, \n"
-                + "	COLOR text NOT NULL, \n"
-                + "	NETO_WEIGHT integer NOT NULL,\n"
-                + "	MAX_WEIGHT integer NOT NULL \n"
-                + ");";
-        
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-                Statement stmt = conn.createStatement()) {
-            // create a new table
-
-            stmt.execute(sql);
-        } catch (SQLException e) {
-        }
-
-    }
-	
-	public void createTransportDestinationsTable() {
-
-        // SQL statement for creating a new table
-        String sql = "CREATE TABLE IF NOT EXISTS TRANSPORT_DESTINATIONS (\n"
-                + "	TRANSPORT_ID integer NOT NULL,\n"
-                + "	SOURCE_ID integer NOT NULL, \n"
-                + "	DESTINATION_ID integer NOT NULL, \n"
-                + " FOREIGN KEY(SOURCE_ID) REFERENCES SOURCES(ID), \n"
-                + " FOREIGN KEY(DESTINATION_ID) REFERENCES DESTINATIONS(ID), \n"
-                + " FOREIGN KEY(TRANSPORT_ID) REFERENCES TRANSPORTAIONS(ID) \n"
-                + ");";
-        
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-                Statement stmt = conn.createStatement()) {
-            // create a new table
-
-            stmt.execute(sql);
-        } catch (SQLException e) {
-        }
-
-    }
-
-	private void createDriversTable() {
-		   // SQL statement for creating a new table
-        String sql = "CREATE TABLE IF NOT EXISTS DRIVERS (\n"
-                + "	ID integer PRIMARY KEY,\n"
-                + "	LICENCE_KIND integer NOT NULL, \n"
-                + "	FIRST_NAME integer NOT NULL, \n"
-                + "	LAST_NAME integer NOT NULL \n"
-                + ");";
-        
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-                Statement stmt = conn.createStatement()) {
-            // create a new table
-
-            stmt.execute(sql);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-
-		
-	}
-	
 
 	
 	
@@ -363,42 +207,18 @@ public class DataBaseManager{
 		
 	}
 	
-	public void insertDriver(boolean scanInput , Driver d) throws ClassNotFoundException {
-		Driver driver;
-		if(scanInput) {
-		Scanner sc = new Scanner(System.in);
+	public void insertDriver()
+	{
+		Scanner sc=new Scanner(System.in);
 		System.out.println("Please enter driver:");
 
 		System.out.println("ID:");
-		int driverId = sc.nextInt();
-		
+		int driverId=sc.nextInt();
+
 		System.out.println("LICENCE KIND:");
-		String LICENCE_KIND = sc.next();
+		String LICENCE_KIND=sc.next();
 
-		System.out.println("FIRST NAME: ");
-		String FIRST_NAME = sc.next();
-
-		System.out.println("LAST NAME: ");
-		String LAST_NAME = sc.next();
-		
-		driver  = new Driver(driverId ,LICENCE_KIND, FIRST_NAME, LAST_NAME);
-		}else {
-			driver = d;
-		}
-		 String sql = "INSERT INTO DRIVERS(ID , LICENCE_KIND ,FIRST_NAME , LAST_NAME) VALUES(? , ? , ? , ? )";
-		 
-	        try (Connection conn = this.getConnection();
-	                PreparedStatement pstmt = conn.prepareStatement(sql)) {
-	            pstmt.setInt(1, driver.getID());
-	            pstmt.setString(2, driver.getLicence_Kind());
-	            pstmt.setString(3, driver.getFirst_Name());
-	            pstmt.setString(4, driver.getLast_Name());
-	   
-	            pstmt.executeUpdate();
-	            System.out.println("New driver has been added!");
-	        } catch (SQLException e) {
-	        }
-		
+		Driver.addDriver(driverId, LICENCE_KIND);
 	}
 	
 	public void insertSource(Source source) throws ClassNotFoundException {
@@ -680,7 +500,7 @@ public class DataBaseManager{
 		
 		
 		System.out.println("=========================================");
-		System.out.println("|   	  Print info Transportation	     	|");
+		System.out.println("|   	  Print info transportation	     	|");
 		System.out.println("=========================================");
 		System.out.println("|Options to print:			|");
 		System.out.println("|        1. Print by ID			|");

@@ -1,4 +1,4 @@
-package Transportation;
+package transportation;
 
 import java.util.Scanner;
 
@@ -8,29 +8,29 @@ public class Main {
 
 		DataBaseManager manager = new DataBaseManager();
 		int input = 0;
-		manager.createNewDatabase("database.db");
-		manager.createTables();
+//		manager.createNewDatabase("database.db");
+//		manager.createTables();
 		Scanner sc = new Scanner(System.in);
 		while (input != 14) {
 			// Display menu graphics
 			System.out.println("=========================================");
-			System.out.println("|   	  Transportation Moudle	     	|");
+			System.out.println("|   	  transportation Moudle	     	|");
 			System.out.println("=========================================");
 			System.out.println("|Options:				|");
-			System.out.println("|        1. Insert Transportation	|");
-			System.out.println("|        2. Update Transportation	|");
-			System.out.println("|        3. Delete Transportation	|");
+			System.out.println("|        1. Insert transportation	|");
+			System.out.println("|        2. Update transportation	|");
+			System.out.println("|        3. Delete transportation	|");
 			System.out.println("|        4. Insert Truck		|");
 			System.out.println("|        5. Delete Truck		|");
 			System.out.println("|        6. Insert Driver		|");
 			System.out.println("|        7. Delete Driver		|");
-			System.out.println("|        8. Get Transportation info	|");
+			System.out.println("|        8. Get transportation info	|");
 			System.out.println("|        9. Get Truck info		|");
 			System.out.println("|        10. Get Driver info		|");
 			System.out.println("|        11. Get Destination info	|");
 			System.out.println("|        12. Get Source info		|");
 			System.out.println("|        13. Get Reservation info	|");
-			System.out.println("|        14. Exit			|");
+			System.out.println("|        14. Go back to Main Menu		|");
 			System.out.println("=========================================");
 			System.out.println("Select option: ");
 			input = sc.nextInt();
@@ -80,7 +80,7 @@ public class Main {
 		if (input == 6) {
 
 			
-			manager.insertDriver(true, null);
+			manager.insertDriver();
 
 		}
 

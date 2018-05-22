@@ -1,4 +1,4 @@
-package Transportation;
+package transportation;
 
 public class Destination {
 	private int ID;
