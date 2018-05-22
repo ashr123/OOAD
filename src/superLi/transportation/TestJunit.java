@@ -1,3 +1,4 @@
+/*
 package superLi.transportation;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
@@ -31,8 +32,8 @@ public class TestJunit {
 		manager.deleteTransport(false, 11);
 		
 	}
-	/*/
-	@Test
+
+
 	public void test_Delete_Transportation() throws ClassNotFoundException, SQLException {
 		manager.insertDriver(false, driver);
 		manager.insertTruck(false, truck);
@@ -100,7 +101,7 @@ public class TestJunit {
 		manager.deleteDriver(false, 12);
 		
 	}
-	/*/
+
 	public String getInfoOf(String ent , int ID) throws ClassNotFoundException, SQLException {
 		String sql;
 		String toReturn = null;
@@ -259,3 +260,4 @@ public class TestJunit {
 	}
 	
 }
+*/

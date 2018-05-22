@@ -12,15 +12,51 @@ public class Main
 	 */
 	public static void main(String[] args)
 	{
+		int input=0;
+		Scanner sc=new Scanner(System.in);
+		while (input!=3)
+		{
+			// Display menu graphics
+			System.out.println("=========================================");
+			System.out.println("|   	  transportation Moudle	     	|");
+			System.out.println("=========================================");
+			System.out.println("|Options:				|");
+			System.out.println("|        1.  Go to Employees Module	|");
+			System.out.println("|        2.  Go to Transportation Module	|");
+			System.out.println("|        3.  Exit	|");
+			System.out.println("=========================================");
+			System.out.println("Select option: ");
+			input=sc.nextInt();
+
+
+			/*
+			 * TRANSPORTATION
+			 */
+
+			if (input==1)
+			{
+				employeesLoop();
+			}
+			if(input==2){
+				superLi.transportation.Main.main();
+			}
+		}
+
+		return;
+	}
+
+	private static void employeesLoop()
+	{
 		Scanner sc=new Scanner(System.in);
 		while (true)
 		{
+
 			int id=0, bankNum, bankBranchNum, bankAccountNum;
 			double salary;
 			String fname, lname, year, month, day, cIsMorningShift;
 			boolean isMorningShift=false;
 			System.out.println("Enter command: 'add'/'update'/'get'/'addworking'/'addqualification'/'addjob'/'addshift'/'showshift" +
-			                   "'/'exit':");
+			                   "'/'back':");
 			String comm=sc.nextLine().trim();
 
 			switch (comm)
@@ -108,7 +144,7 @@ public class Main
 					System.out.print("Is it a morning shift? (y/n): ");
 					cIsMorningShift=sc.nextLine();
 					isMorningShift=cIsMorningShift.equals("y");
-					if (!Shift.isShiftExists(day, month, year,isMorningShift))
+					if (!Shift.isShiftExists(day, month, year, isMorningShift))
 					{
 						System.out.println("Available managers for this shift:\n"+
 						                   Employee.showAvailableEmployeesToShift(day,
@@ -150,7 +186,7 @@ public class Main
 					System.out.println(Shift.showShiftAt(day, month, year, isMorningShift));
 					break;
 				case "q":
-				case "exit":
+				case "back":
 					return;
 				default:
 					System.out.println("Illegal command");

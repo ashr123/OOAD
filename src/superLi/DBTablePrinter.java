@@ -430,7 +430,7 @@ public class DBTablePrinter
 			}
 			if (rs.isClosed())
 			{
-				System.err.println("DBTablePrinter Error: Result Set is closed!");
+//				System.err.println("DBTablePrinter Error: Result Set is closed!");
 				return null;
 			}
 			if (maxStringColWidth<1)

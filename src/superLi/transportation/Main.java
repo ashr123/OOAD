@@ -4,42 +4,40 @@ import java.util.Scanner;
 
 public class Main {
 
-	public static void main(String[] args) throws ClassNotFoundException {
+	public static void main() {
 
 		DataBaseManager manager = new DataBaseManager();
 		int input = 0;
 //		manager.createNewDatabase("database.db");
 //		manager.createTables();
 		Scanner sc = new Scanner(System.in);
-		while (input != 14) {
+		while (input != 12) {
 			// Display menu graphics
 			System.out.println("=========================================");
-			System.out.println("|   	  superLi.transportation Moudle	     	|");
+			System.out.println("|   	  transportation Moudle	     	|");
 			System.out.println("=========================================");
 			System.out.println("|Options:				|");
-			System.out.println("|        1. Insert superLi.transportation	|");
-			System.out.println("|        2. Update superLi.transportation	|");
-			System.out.println("|        3. Delete superLi.transportation	|");
+			System.out.println("|        1. Insert transportation	|");
+			System.out.println("|        2. Update transportation	|");
+			System.out.println("|        3. Delete transportation	|");
 			System.out.println("|        4. Insert Truck		|");
 			System.out.println("|        5. Delete Truck		|");
-			System.out.println("|        6. Insert Driver		|");
-			System.out.println("|        7. Delete Driver		|");
-			System.out.println("|        8. Get superLi.transportation info	|");
-			System.out.println("|        9. Get Truck info		|");
-			System.out.println("|        10. Get Driver info		|");
-			System.out.println("|        11. Get Destination info	|");
-			System.out.println("|        12. Get Source info		|");
-			System.out.println("|        13. Get Reservation info	|");
-			System.out.println("|        14. Go back to Main Menu		|");
+			System.out.println("|        6. Get transportation info	|");
+			System.out.println("|        7. Get Truck info		|");
+			System.out.println("|        8. Get Driver info		|");
+			System.out.println("|        9. Get Destination info	|");
+			System.out.println("|        10. Get Source info		|");
+			System.out.println("|        11. Get Reservation info	|");
+			System.out.println("|        12. Go back to Main Menu		|");
 			System.out.println("=========================================");
 			System.out.println("Select option: ");
 			input = sc.nextInt();
-	
+
 
 		/*
 		 * TRANSPORTATION
 		 */
-			
+
 		if (input == 1) {
 
 			manager.insertTransport(true , null);
@@ -74,47 +72,30 @@ public class Main {
 		}
 		
 		/*
-		 * DRIVER
-		 */
-		
-		if (input == 6) {
-
-			
-			manager.insertDriver();
-
-		}
-
-
-		if (input == 7) {
-			manager.deleteDriver(true , 0);
-
-		}
-		
-		/*
 		 * INFO
 		 */
 		
-		if (input == 8) {
+		if (input == 6) {
 			manager.getInfoTransport();
 		}
 		
-		if (input == 9) {
+		if (input == 7) {
 
 			manager.getInfoTruck();
 		}
-		if (input == 10) {
+		if (input == 8) {
 
 			manager.getInfoDriver();
 		}
-		if (input == 11) {
+		if (input == 9) {
 
 			manager.getInfoDestination();
 		}
-		if (input == 12) {
+		if (input == 10) {
 
 			manager.getInfoSource();
 		}
-		if (input == 13) {
+		if (input == 11) {
 
 			manager.getInfoReservation();
 		}

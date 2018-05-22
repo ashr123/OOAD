@@ -6,6 +6,7 @@ import superLi.DBTablePrinter;
 import java.sql.*;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Scanner;
 
 /**
  * Represents an employee in a neighborhood grocery store.
@@ -22,10 +23,10 @@ public class Employee
 			     Statement stmt=conn.createStatement())
 			{
 				stmt.execute("PRAGMA foreign_keys=ON");
-//				stmt.executeUpdate("DROP TABLE IF EXISTS Employees;");
-//				stmt.executeUpdate("DROP TABLE IF EXISTS WorkingHours;");
-//				stmt.executeUpdate("DROP TABLE IF EXISTS jobs;");
-//				stmt.executeUpdate("DROP TABLE IF EXISTS Qualifications;");
+				//				stmt.executeUpdate("DROP TABLE IF EXISTS Employees;");
+				//				stmt.executeUpdate("DROP TABLE IF EXISTS WorkingHours;");
+				//				stmt.executeUpdate("DROP TABLE IF EXISTS jobs;");
+				//				stmt.executeUpdate("DROP TABLE IF EXISTS Qualifications;");
 				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS Employees"+
 				                   '('+
 				                   "ID INTEGER PRIMARY KEY CHECK (ID BETWEEN 100000000 AND 999999999), "+
@@ -194,7 +195,8 @@ public class Employee
 	 * @param bankAccountNum number of the employee's bank account
 	 * @return {@code true} if the employee was added successfully to the DB, {@code false} otherwise
 	 */
-	public static boolean addEmployee(int ID, String firstName, String lastName, double salary, int bankNum, int bankBranchNum, int bankAccountNum)
+	public static boolean addEmployee(int ID, String firstName, String lastName, double salary, int bankNum,
+	                                  int bankBranchNum, int bankAccountNum)
 	{
 		try (Connection conn=getConnection();
 		     PreparedStatement stmt=conn.prepareStatement(
@@ -252,10 +254,12 @@ public class Employee
 		}
 	}
 
-	public static boolean addAvailability(int ID, String day, String month, String year, boolean isMorningShift, boolean isNoonShift)
+	public static boolean addAvailability(int ID, String day, String month, String year, boolean isMorningShift,
+	                                      boolean isNoonShift)
 	{
 		try (Connection conn=getConnection();
-		     PreparedStatement stmt=conn.prepareStatement("INSERT INTO WorkingHours (ID, date, morningShift, noonShift) VALUES (?, ?, ?, ?);"))
+		     PreparedStatement stmt=conn.prepareStatement(
+				     "INSERT INTO WorkingHours (ID, date, morningShift, noonShift) VALUES (?, ?, ?, ?);"))
 		{
 			stmt.setInt(1, ID);
 			stmt.setString(2, year+'-'+month+'-'+day);
@@ -277,8 +281,17 @@ public class Employee
 		     PreparedStatement stmt=conn.prepareStatement("INSERT INTO Qualifications (ID, job) VALUES (?, ?);"))
 		{
 			stmt.setInt(1, ID);
-			stmt.setString(2, job);
+			stmt.setString(2, job.trim());
 			stmt.executeUpdate();
+			if (job.equals("Driver"))
+				try (PreparedStatement stmt2=conn.prepareStatement(
+						"INSERT INTO DRIVERS (ID, LICENCE_KIND) VALUES (?, ?);"))
+				{
+					stmt2.setInt(1, ID);
+					System.out.print("Enter licence kind: ");
+					stmt2.setString(2, new Scanner(System.in).nextLine().trim());
+					stmt2.executeUpdate();
+				}
 			return true;
 		}
 		catch (SQLException e)
@@ -395,7 +408,8 @@ public class Employee
 	 * @param bankAccountNum number of the employee's bank account
 	 * @return {@code true} if the update was successful, {@code false} otherwise
 	 */
-	public synchronized boolean updateEmployee(String firstName, String lastName, double salary, int bankNum, int bankBranchNum, int bankAccountNum)
+	public synchronized boolean updateEmployee(String firstName, String lastName, double salary, int bankNum,
+	                                           int bankBranchNum, int bankAccountNum)
 	{
 		try (Connection conn=getConnection();
 		     PreparedStatement stmt=conn.prepareStatement("UPDATE Employees SET firstName=?, "+
