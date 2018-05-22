@@ -1,4 +1,4 @@
-package transportation;
+package superLi.transportation;
 
 import org.sqlite.SQLiteConfig;
 import superLi.employees.Employee;

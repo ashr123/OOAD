@@ -1,4 +1,4 @@
-package transportation;
+package superLi.transportation;
 
 import java.util.Scanner;
 
@@ -14,17 +14,17 @@ public class Main {
 		while (input != 14) {
 			// Display menu graphics
 			System.out.println("=========================================");
-			System.out.println("|   	  transportation Moudle	     	|");
+			System.out.println("|   	  superLi.transportation Moudle	     	|");
 			System.out.println("=========================================");
 			System.out.println("|Options:				|");
-			System.out.println("|        1. Insert transportation	|");
-			System.out.println("|        2. Update transportation	|");
-			System.out.println("|        3. Delete transportation	|");
+			System.out.println("|        1. Insert superLi.transportation	|");
+			System.out.println("|        2. Update superLi.transportation	|");
+			System.out.println("|        3. Delete superLi.transportation	|");
 			System.out.println("|        4. Insert Truck		|");
 			System.out.println("|        5. Delete Truck		|");
 			System.out.println("|        6. Insert Driver		|");
 			System.out.println("|        7. Delete Driver		|");
-			System.out.println("|        8. Get transportation info	|");
+			System.out.println("|        8. Get superLi.transportation info	|");
 			System.out.println("|        9. Get Truck info		|");
 			System.out.println("|        10. Get Driver info		|");
 			System.out.println("|        11. Get Destination info	|");

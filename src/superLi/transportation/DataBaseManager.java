@@ -1,4 +1,4 @@
-package transportation;
+package superLi.transportation;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -54,7 +54,7 @@ public class DataBaseManager{
 		
 		LinkedList<Destination> DestinationList = new LinkedList<Destination>();
 		
-		System.out.println("Please insert transportation id:");
+		System.out.println("Please insert superLi.transportation id:");
 		int iD = sc.nextInt();
 
 		System.out.println("Truck id:");
@@ -286,7 +286,7 @@ public class DataBaseManager{
 		String sql;
 		
 		
-		System.out.println("Please insert transportation id to update:");
+		System.out.println("Please insert superLi.transportation id to update:");
 		ID = sc.nextInt();
 
 		System.out.println("=========================================");
@@ -408,7 +408,7 @@ public class DataBaseManager{
 		String sql;	
 		if(scanInput) {
 		Scanner sc = new Scanner(System.in);
-		System.out.println("Please insert transportation id to delete:");
+		System.out.println("Please insert superLi.transportation id to delete:");
 		ID = sc.nextInt();
 		}
 		else {
@@ -500,7 +500,7 @@ public class DataBaseManager{
 		
 		
 		System.out.println("=========================================");
-		System.out.println("|   	  Print info transportation	     	|");
+		System.out.println("|   	  Print info superLi.transportation	     	|");
 		System.out.println("=========================================");
 		System.out.println("|Options to print:			|");
 		System.out.println("|        1. Print by ID			|");
@@ -513,7 +513,7 @@ public class DataBaseManager{
 		// Switch construct
 		switch (input) {
 		case 1:
-			System.out.println("Please insert transportation id to show:");
+			System.out.println("Please insert superLi.transportation id to show:");
 			ID = sc.nextInt();
 			sql = "SELECT ID, TRUCK_ID , DRIVER_ID , DEAPARTURE_TIME , DEAPARTURE_DATE FROM TRANSPORTAIONS WHERE Id = ?";
 			 

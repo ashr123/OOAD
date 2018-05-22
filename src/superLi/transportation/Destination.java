@@ -1,4 +1,4 @@
-package transportation;
+package superLi.transportation;
 
 public class Destination {
 	private int ID;
