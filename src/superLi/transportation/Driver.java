@@ -34,7 +34,7 @@ public class Driver extends Employee
 					                  employee.getStartingDate(),
 					                  employee.getSalary(),
 					                  employee.getBankNum(),
-					                  employee.getbankBranchNum(),
+					                  employee.getBankBranchNum(),
 					                  employee.getBankAccountNum(),
 					                  resultSet.getString(0));
 				else
