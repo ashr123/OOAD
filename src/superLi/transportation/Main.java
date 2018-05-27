@@ -1,5 +1,6 @@
 package superLi.transportation;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
@@ -31,7 +32,14 @@ public class Main {
 			System.out.println("|        12. Go back to Main Menu		|");
 			System.out.println("=========================================");
 			System.out.println("Select option: ");
-			input = sc.nextInt();
+			try
+			{
+				input=sc.nextInt();
+			}
+			catch (InputMismatchException ignored)
+			{
+				continue;
+			}
 
 
 		/*
