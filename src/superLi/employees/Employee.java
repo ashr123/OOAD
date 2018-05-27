@@ -84,15 +84,15 @@ public class Employee
 				                   +" FOREIGN KEY(TRUCK_ID) REFERENCES TRUCKS(ID)"
 				                   +");"
 				                  );
-				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS TRANSPORT_DESTINATIONS ("
-				                   +"	TRANSPORT_ID integer NOT NULL,"
-				                   +"	SOURCE_ID integer NOT NULL, "
-				                   +"	DESTINATION_ID integer NOT NULL, "
-				                   +" FOREIGN KEY(SOURCE_ID) REFERENCES SOURCES(ID), "
-				                   +" FOREIGN KEY(DESTINATION_ID) REFERENCES DESTINATIONS(ID), "
-				                   +" FOREIGN KEY(TRANSPORT_ID) REFERENCES TRANSPORTAIONS(ID) "
-				                   +");"
-				                  );
+//				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS TRANSPORT_DESTINATIONS ("
+//				                   +"	TRANSPORT_ID integer NOT NULL,"
+//				                   +"	SOURCE_ID integer NOT NULL, "
+//				                   +"	DESTINATION_ID integer NOT NULL, "
+//				                   +" FOREIGN KEY(SOURCE_ID) REFERENCES SOURCES(ID), "
+//				                   +" FOREIGN KEY(DESTINATION_ID) REFERENCES DESTINATIONS(ID), "
+//				                   +" FOREIGN KEY(TRANSPORT_ID) REFERENCES TRANSPORTAIONS(ID) "
+//				                   +");"
+//				                  );
 				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS DESTINATIONS ("
 				                   +"	ID integer PRIMARY KEY,"
 				                   +"	ADDRESS text NOT NULL,"
@@ -200,7 +200,8 @@ public class Employee
 	{
 		try (Connection conn=getConnection();
 		     PreparedStatement stmt=conn.prepareStatement(
-				     "INSERT INTO Employees (ID, firstName, lastName, salary, startingDate, bankNum, bankBranchNum, bankAccountNum) VALUES (?, ?, ?, ?, date('now'), ?, ?, ?);"))
+				     "INSERT INTO Employees (ID, firstName, lastName, salary, startingDate, bankNum, bankBranchNum, bankAccountNum) " +
+						     "VALUES (?, ?, ?, ?, date('now'), ?, ?, ?);"))
 		{
 			stmt.setInt(1, ID);
 			stmt.setString(2, firstName.trim());
@@ -228,23 +229,57 @@ public class Employee
 	public static Employee getEmployee(int ID)
 	{
 		try (Connection conn=getConnection();
-		     PreparedStatement stmt=conn.prepareStatement("SELECT * FROM Employees WHERE ID=?;"))
+		     PreparedStatement stmt=conn.prepareStatement("SELECT * FROM Employees;");
+		     PreparedStatement stmt1=conn.prepareStatement("SELECT * FROM DRIVERS;");
+		     PreparedStatement stmt2=conn.prepareStatement("SELECT * FROM DESTINATIONS;");
+		     PreparedStatement stmt3=conn.prepareStatement("SELECT * FROM Jobs;");
+		     PreparedStatement stmt4=conn.prepareStatement("SELECT * FROM Qualifications;");
+		     PreparedStatement stmt5=conn.prepareStatement("SELECT * FROM RESERVATION_DOCUMENTS;");
+		     PreparedStatement stmt6=conn.prepareStatement("SELECT * FROM Shifts;");
+		     PreparedStatement stmt7=conn.prepareStatement("SELECT * FROM SOURCES;");
+		     PreparedStatement stmt9=conn.prepareStatement("SELECT * FROM TRANSPORTAIONS;");
+		     PreparedStatement stmt10=conn.prepareStatement("SELECT * FROM TRUCKS;");
+		     PreparedStatement stmt11=conn.prepareStatement("SELECT * FROM WorkingHours;"))
+//		     PreparedStatement stmt12=conn.prepareStatement("SELECT * FROM Employees WHERE ID=?;"))
 		{
-			stmt.setInt(1, ID);
-			try (ResultSet resultSet=stmt.executeQuery())
+//			stmt.setInt(1, ID);
+			try (ResultSet resultSet=stmt.executeQuery();
+			     ResultSet resultSet1=stmt1.executeQuery();
+			     ResultSet resultSet2=stmt2.executeQuery();
+			     ResultSet resultSet3=stmt3.executeQuery();
+			     ResultSet resultSet4=stmt4.executeQuery();
+			     ResultSet resultSet5=stmt5.executeQuery();
+			     ResultSet resultSet6=stmt6.executeQuery();
+			     ResultSet resultSet7=stmt7.executeQuery();
+			     ResultSet resultSet9=stmt9.executeQuery();
+			     ResultSet resultSet10=stmt10.executeQuery();
+			     ResultSet resultSet11=stmt11.executeQuery())
 			{
-				if (resultSet.next())
-					return new Employee(resultSet.getInt("ID"),
-					                    resultSet.getString("firstName"),
-					                    resultSet.getString("lastName"),
-					                    Date.valueOf(resultSet.getString("startingDate")),
-					                    resultSet.getDouble("salary"),
-					                    resultSet.getInt("bankNum"),
-					                    resultSet.getInt("bankBranchNum"),
-					                    resultSet.getInt("bankAccountNum")
-					);
-				else
-					return null;
+				System.out.println(DBTablePrinter.printResultSet(resultSet)+
+						                   DBTablePrinter.printResultSet(resultSet1)+
+						                   DBTablePrinter.printResultSet(resultSet2)+
+						                   DBTablePrinter.printResultSet(resultSet3)+
+						                   DBTablePrinter.printResultSet(resultSet4)+
+						                   DBTablePrinter.printResultSet(resultSet5)+
+						                   DBTablePrinter.printResultSet(resultSet6)+
+						                   DBTablePrinter.printResultSet(resultSet7)+
+						                   DBTablePrinter.printResultSet(resultSet9)+
+						                   DBTablePrinter.printResultSet(resultSet10)+
+						                   DBTablePrinter.printResultSet(resultSet11));
+				return null;
+			
+//				if (resultSet.next())
+//					return new Employee(resultSet.getInt("ID"),
+//					                    resultSet.getString("firstName"),
+//					                    resultSet.getString("lastName"),
+//					                    Date.valueOf(resultSet.getString("startingDate")),
+//					                    resultSet.getDouble("salary"),
+//					                    resultSet.getInt("bankNum"),
+//					                    resultSet.getInt("bankBranchNum"),
+//					                    resultSet.getInt("bankAccountNum")
+//					);
+//				else
+//					return null;
 			}
 		}
 		catch (SQLException e)

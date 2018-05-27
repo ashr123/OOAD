@@ -1,9 +1,10 @@
 package superLi.transportation;
 
 import org.sqlite.SQLiteConfig;
-import superLi.employees.Employee;
+import superLi.employees.Shift;
 
 import java.sql.*;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Scanner;
 
@@ -1007,11 +1008,19 @@ public class DataBaseManager
 
 		//Check for houseman working on the shift of the transport
 		//Check for driver id is exists in the shift
+		
 		boolean isMorning =Integer.parseInt(hour)<12;
-		boolean isWorkingStorekeeper = Employee.showAvailableEmployeesToShift(day,month,year, isMorning, "Storekeeper")
-		                          !=null;
-		boolean isWorkingDriver=Employee.showAvailableEmployeesToShift(day, month, year, isMorning, "Driver")
-		                        !=null;
+		Shift shift=Shift.getShift(day, month, year, isMorning);
+		if (shift==null)
+			return false;
+		boolean isWorkingStorekeeper=false;
+		boolean isWorkingDriver=false;
+		for (Collection<String> collection : shift.getEmployeeToJobsMap().values())
+		{
+			isWorkingStorekeeper=isWorkingStorekeeper || collection.contains("Storekeeper");
+			isWorkingDriver=isWorkingDriver || collection.contains("Driver");
+		}
+		
 		if(!isWorkingStorekeeper || !isWorkingDriver)
 			return false;
 
@@ -1020,7 +1029,7 @@ public class DataBaseManager
 		String sql="SELECT MODEL FROM TRUCKS WHERE Id = ?";
 		String model=null;
 		String licene=null;
-		try (Connection conn=this.getConnection();
+		try (Connection conn=getConnection();
 		     PreparedStatement pstmt=conn.prepareStatement(sql))
 		{
 
